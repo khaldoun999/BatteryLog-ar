@@ -28,8 +28,8 @@ object Fmt {
         val d = Instant.ofEpochMilli(ms).atZone(zone).toLocalDate()
         val today = LocalDate.now(zone)
         val prefix = when (d) {
-            today -> "Today"
-            today.minusDays(1) -> "Yesterday"
+            today -> "اليوم"
+            today.minusDays(1) -> "أمس"
             else -> date(ms)
         }
         return "$prefix ${time(ms)}"
@@ -42,16 +42,16 @@ object Fmt {
         val h = (s % 86_400) / 3600
         val m = (s % 3600) / 60
         return when {
-            d > 0 -> "${d}d ${h}h"
-            h > 0 -> "${h}h %02dm".format(m)
-            m > 0 -> "${m}m"
-            else -> "${s}s"
+            d > 0 -> "${d} يوم ${h} س"
+            h > 0 -> "${h} س %02d د".format(m)
+            m > 0 -> "${m} د"
+            else -> "${s} ث"
         }
     }
 
     fun ago(ms: Long, now: Long = System.currentTimeMillis()): String {
         val d = now - ms
-        return if (d < 60_000) "just now" else "${duration(d)} ago"
+        return if (d < 60_000) "الآن" else "منذ ${duration(d)}"
     }
 
     fun temp(c: Double, unit: TempUnit): String =

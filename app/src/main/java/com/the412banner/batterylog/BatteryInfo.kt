@@ -20,9 +20,9 @@ data class BatteryInfo(
     val avgCurrentMa: Double = Double.NaN,
     val chargeNowMah: Int = -1,
 ) {
-    val status: String get() = STATUS[statusCode] ?: "Unknown"
-    val plugged: String get() = PLUGGED[pluggedCode] ?: "Unknown"
-    val health: String get() = HEALTH[healthCode] ?: "Unknown"
+    val status: String get() = STATUS[statusCode] ?: "غير معروف"
+    val plugged: String get() = PLUGGED[pluggedCode] ?: "غير معروف"
+    val health: String get() = HEALTH[healthCode] ?: "غير معروف"
 
     val onCharger: Boolean get() =
         statusCode == BatteryManager.BATTERY_STATUS_CHARGING || statusCode == BatteryManager.BATTERY_STATUS_FULL ||
@@ -77,25 +77,25 @@ data class BatteryInfo(
         }
 
         private val STATUS = mapOf(
-            BatteryManager.BATTERY_STATUS_CHARGING to "Charging",
-            BatteryManager.BATTERY_STATUS_DISCHARGING to "Discharging",
-            BatteryManager.BATTERY_STATUS_NOT_CHARGING to "Not charging",
-            BatteryManager.BATTERY_STATUS_FULL to "Full",
+            BatteryManager.BATTERY_STATUS_CHARGING to "يُشحن",
+            BatteryManager.BATTERY_STATUS_DISCHARGING to "يُفرّغ",
+            BatteryManager.BATTERY_STATUS_NOT_CHARGING to "لا يُشحن",
+            BatteryManager.BATTERY_STATUS_FULL to "ممتلئة",
         )
         private val PLUGGED = mapOf(
-            BatteryManager.BATTERY_PLUGGED_AC to "AC charger",
+            BatteryManager.BATTERY_PLUGGED_AC to "شاحن كهرباء",
             BatteryManager.BATTERY_PLUGGED_USB to "USB",
-            BatteryManager.BATTERY_PLUGGED_WIRELESS to "Wireless",
-            BatteryManager.BATTERY_PLUGGED_DOCK to "Dock",
-            0 to "Battery",
+            BatteryManager.BATTERY_PLUGGED_WIRELESS to "لاسلكي",
+            BatteryManager.BATTERY_PLUGGED_DOCK to "قاعدة شحن",
+            0 to "البطارية",
         )
         private val HEALTH = mapOf(
-            BatteryManager.BATTERY_HEALTH_GOOD to "Good",
-            BatteryManager.BATTERY_HEALTH_OVERHEAT to "Overheat",
-            BatteryManager.BATTERY_HEALTH_DEAD to "Dead",
-            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE to "Over-voltage",
-            BatteryManager.BATTERY_HEALTH_COLD to "Cold",
-            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE to "Failure",
+            BatteryManager.BATTERY_HEALTH_GOOD to "جيدة",
+            BatteryManager.BATTERY_HEALTH_OVERHEAT to "حرارة زائدة",
+            BatteryManager.BATTERY_HEALTH_DEAD to "تالفة",
+            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE to "جهد زائد",
+            BatteryManager.BATTERY_HEALTH_COLD to "باردة",
+            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE to "عطل",
         )
     }
 }

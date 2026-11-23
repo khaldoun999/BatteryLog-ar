@@ -120,35 +120,35 @@ class HealthViewModel(private val app: BatteryLogApp) : ViewModel() {
 
     private fun act(label: String, block: suspend () -> String) = viewModelScope.launch {
         _ui.update { it.copy(busy = true, message = null) }
-        val msg = runCatching { block() }.getOrElse { "$label failed: ${it.message}" }
+        val msg = runCatching { block() }.getOrElse { "فشل $label: ${it.message}" }
         _ui.update { it.copy(busy = false, message = msg) }
         refresh()
     }
 
-    fun setLimit(pct: Int) = act("Charge limit") {
+    fun setLimit(pct: Int) = act("حد الشحن") {
         val ok = withContext(Dispatchers.IO) { ChargeControl.setLimit(pct) }
-        if (ok) (if (pct >= 100) "Charge limit off" else "Charging now stops at $pct %") else "The kernel didn't keep that value"
+        if (ok) (if (pct >= 100) "حد الشحن متوقف" else "سيتوقف الشحن الآن عند $pct %") else "لم تحتفظ النواة بهذه القيمة"
     }
 
-    fun setSpeed(value: Int) = act("Charge speed") {
-        val st = _ui.value.charge ?: return@act "Not supported"
+    fun setSpeed(value: Int) = act("سرعة الشحن") {
+        val st = _ui.value.charge ?: return@act "غير مدعوم"
         val ok = withContext(Dispatchers.IO) { ChargeControl.setSpeed(st, value) }
-        if (ok) "Charge speed set" else "The kernel didn't keep that value"
+        if (ok) "تم ضبط سرعة الشحن" else "لم تحتفظ النواة بهذه القيمة"
     }
 
-    fun installModule() = act("Install") {
+    fun installModule() = act("التثبيت") {
         val r = withContext(Dispatchers.IO) { MagiskModule.install(app) }
-        if (r.ok && r.out.contains("INSTALL_OK")) "Boot module installed. It starts after the next reboot." else "Install failed: ${r.out.take(160)}"
+        if (r.ok && r.out.contains("INSTALL_OK")) "تم تثبيت وحدة الإقلاع. ستبدأ بعد إعادة التشغيل التالية." else "فشل التثبيت: ${r.out.take(160)}"
     }
 
-    fun removeModule() = act("Remove") {
+    fun removeModule() = act("الإزالة") {
         val r = withContext(Dispatchers.IO) { MagiskModule.remove() }
-        if (r.ok) "Boot module removed (gone after the next reboot)" else "Remove failed: ${r.out.take(160)}"
+        if (r.ok) "أُزيلت وحدة الإقلاع (ستختفي بعد إعادة التشغيل التالية)" else "فشلت الإزالة: ${r.out.take(160)}"
     }
 
-    fun deleteOlderThan(days: Int) = act("Clean up") {
+    fun deleteOlderThan(days: Int) = act("التنظيف") {
         val n = app.logs.deleteOlderThan(days, BatteryLogService.currentLogPath)
-        "Deleted $n log${if (n == 1) "" else "s"} older than $days days"
+        "حُذف $n سجل أقدم من $days يوم"
     }
 
     suspend fun zipAll() = app.logs.zipAll()
@@ -211,7 +211,7 @@ fun HealthContent(ui: HealthUi, actions: HealthActions) {
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).statusBarsPadding().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Battery health", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
+        Text("صحة البطارية", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
         ui.message?.let {
             AppCard(color = MaterialTheme.colorScheme.secondaryContainer) {
                 Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
@@ -234,51 +234,51 @@ fun HealthContent(ui: HealthUi, actions: HealthActions) {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(soh?.let { "%.0f".format(it) } ?: "—", style = MaterialTheme.typography.displayMedium)
-                    Text("% health", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("% الصحة", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                MiniStat("Full now", s?.fullMah?.let { "%,d mAh".format(it) } ?: "—")
-                MiniStat("Design", s?.designMah?.let { "%,d mAh".format(it) } ?: "—")
-                MiniStat("Cycles", s?.cycleCount?.toString() ?: "—")
+                MiniStat("الكاملة الآن", s?.fullMah?.let { "%,d mAh".format(it) } ?: "—")
+                MiniStat("التصميمية", s?.designMah?.let { "%,d mAh".format(it) } ?: "—")
+                MiniStat("الدورات", s?.cycleCount?.toString() ?: "—")
             }
             Spacer(Modifier.height(12.dp))
             InfoRow(
-                "Measured from your logs",
-                ui.measured?.let { "%,d mAh (%d run%s)".format(it.fullMah, it.runs, if (it.runs == 1) "" else "s") } ?: "needs a ≥ 15 % discharge",
+                "المقاسة من سجلاتك",
+                ui.measured?.let { "%,d mAh (%d جلسة)".format(it.fullMah, it.runs) } ?: "يحتاج إلى تفريغ ≥ 15 %",
             )
-            s?.lostMah?.let { lost -> if (lost > 0) InfoRow("Capacity lost", "%,d mAh".format(lost), valueColor = c.drain) }
+            s?.lostMah?.let { lost -> if (lost > 0) InfoRow("السعة المفقودة", "%,d mAh".format(lost), valueColor = c.drain) }
         }
 
-        SectionCard("Battery details", Icons.Rounded.Info, tint = MaterialTheme.colorScheme.secondary) {
-            InfoRow("Model", s?.model ?: "—")
-            s?.manufacturer?.let { InfoRow("Maker", it) }
-            InfoRow("Technology", s?.technology ?: "—")
-            InfoRow("Cells", ui.cells.let { "${it}S (${if (it == 1) "single cell" else "$it in series"})" })
-            InfoRow("Charge voltage", s?.vmaxMv?.let { Fmt.volts(it) } ?: "—")
-            InfoRow("Resting voltage", s?.ocvMv?.let { Fmt.volts(it) } ?: "—")
-            InfoRow("Temperature", s?.tempC?.let { Fmt.temp(it, ui.tempUnit) } ?: "—")
+        SectionCard("تفاصيل البطارية", Icons.Rounded.Info, tint = MaterialTheme.colorScheme.secondary) {
+            InfoRow("الطراز", s?.model ?: "—")
+            s?.manufacturer?.let { InfoRow("الشركة المصنعة", it) }
+            InfoRow("التقنية", s?.technology ?: "—")
+            InfoRow("الخلايا", ui.cells.let { "${it}S (${if (it == 1) "خلية واحدة" else "$it على التوالي"})" })
+            InfoRow("جهد الشحن", s?.vmaxMv?.let { Fmt.volts(it) } ?: "—")
+            InfoRow("جهد الراحة", s?.ocvMv?.let { Fmt.volts(it) } ?: "—")
+            InfoRow("الحرارة", s?.tempC?.let { Fmt.temp(it, ui.tempUnit) } ?: "—")
             if (s?.usedRoot == true) {
-                Text("Some values read with root", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("بعض القيم قُرئت بالروت", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
         ChargeCard(ui, actions)
         ModuleCard(ui, actions)
 
-        SectionCard("Log storage", Icons.Rounded.Folder, tint = c.voltage) {
-            InfoRow("Folder", ui.storage.dir.removePrefix("/storage/emulated/0"))
-            InfoRow("Logs", "${ui.storage.count} · ${Fmt.bytes(ui.storage.bytes)}")
+        SectionCard("تخزين السجلات", Icons.Rounded.Folder, tint = c.voltage) {
+            InfoRow("المجلد", ui.storage.dir.removePrefix("/storage/emulated/0"))
+            InfoRow("السجلات", "${ui.storage.count} · ${Fmt.bytes(ui.storage.bytes)}")
             InfoRow(
-                "Survives reinstall",
-                if (ui.storage.publicOk) "Yes" else "No",
+                "يبقى بعد إعادة التثبيت",
+                if (ui.storage.publicOk) "نعم" else "لا",
                 valueColor = if (ui.storage.publicOk) c.level else c.warn,
             )
             Spacer(Modifier.height(8.dp))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (!ui.storage.publicOk) FilledTonalButton(onClick = actions.grantFiles) { Text("Allow file access") }
-                FilledTonalButton(onClick = actions.shareAll, enabled = ui.storage.count > 0) { Text("Share all logs") }
-                OutlinedButton(onClick = { cleanup = true }, enabled = ui.storage.count > 0) { Text("Delete old logs") }
+                if (!ui.storage.publicOk) FilledTonalButton(onClick = actions.grantFiles) { Text("السماح بالوصول إلى الملفات") }
+                FilledTonalButton(onClick = actions.shareAll, enabled = ui.storage.count > 0) { Text("مشاركة كل السجلات") }
+                OutlinedButton(onClick = { cleanup = true }, enabled = ui.storage.count > 0) { Text("حذف السجلات القديمة") }
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -288,20 +288,20 @@ fun HealthContent(ui: HealthUi, actions: HealthActions) {
         var days by remember { mutableIntStateOf(90) }
         AlertDialog(
             onDismissRequest = { cleanup = false },
-            title = { Text("Delete old logs") },
+            title = { Text("حذف السجلات القديمة") },
             text = {
                 Column {
-                    Text("Delete logs whose last entry is older than:", style = MaterialTheme.typography.bodyMedium)
+                    Text("احذف السجلات التي يزيد عمر آخر إدخال فيها عن:", style = MaterialTheme.typography.bodyMedium)
                     listOf(30, 90, 180, 365).forEach { d ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(selected = days == d, onClick = { days = d })
-                            Text("$d days")
+                            Text("$d يوم")
                         }
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { cleanup = false; actions.deleteOlderThan(days) }) { Text("Delete") } },
-            dismissButton = { TextButton(onClick = { cleanup = false }) { Text("Cancel") } },
+            confirmButton = { TextButton(onClick = { cleanup = false; actions.deleteOlderThan(days) }) { Text("حذف") } },
+            dismissButton = { TextButton(onClick = { cleanup = false }) { Text("إلغاء") } },
         )
     }
 }
@@ -313,16 +313,16 @@ private fun ChargeCard(ui: HealthUi, actions: HealthActions) {
     val c = LocalChartColors.current
     val root = ui.root == true
     SectionCard(
-        "Charging",
+        "الشحن",
         Icons.Rounded.ElectricBolt,
         tint = c.charging,
-        subtitle = if (root) "Root: changes are read back to confirm" else "Changing these needs root",
+        subtitle = if (root) "الروت: تُقرأ التغييرات مجدداً للتأكيد" else "تغيير هذه الخيارات يحتاج إلى روت",
     ) {
         if (st.endThreshold != null) {
             val end = st.endThreshold
             InfoRow(
-                "Charge limit",
-                if (end >= 100) "Off (charges to 100 %)" else "Stops at $end %" + (st.startThreshold?.let { ", resumes at $it %" } ?: ""),
+                "حد الشحن",
+                if (end >= 100) "متوقف (يُشحن إلى 100 %)" else "يتوقف عند $end %" + (st.startThreshold?.let { "، ويستأنف عند $it %" } ?: ""),
             )
             if (st.limitWritable && root) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -331,7 +331,7 @@ private fun ChargeCard(ui: HealthUi, actions: HealthActions) {
                             selected = end == p,
                             onClick = { actions.setLimit(p) },
                             enabled = !ui.busy,
-                            label = { Text(if (p == 100) "Off" else "$p %") },
+                            label = { Text(if (p == 100) "إيقاف" else "$p %") },
                         )
                     }
                 }
@@ -342,12 +342,12 @@ private fun ChargeCard(ui: HealthUi, actions: HealthActions) {
         if (st.speedKind != ChargeControl.SpeedKind.None && max != null && value != null) {
             Spacer(Modifier.height(6.dp))
             val label = when (st.speedKind) {
-                ChargeControl.SpeedKind.Current -> if (value >= max) "${Fmt.amps(value)} (full)" else "${Fmt.amps(value)} of ${Fmt.amps(max)}"
-                else -> if (value == 0) "Full speed" else "Slowed, level $value of $max"
+                ChargeControl.SpeedKind.Current -> if (value >= max) "${Fmt.amps(value)} (كاملة)" else "${Fmt.amps(value)} من ${Fmt.amps(max)}"
+                else -> if (value == 0) "سرعة كاملة" else "مخفّضة، المستوى $value من $max"
             }
-            InfoRow("Charge speed", label)
+            InfoRow("سرعة الشحن", label)
             if (!st.speedWritable) {
-                Text("Set by the system on this device", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("يضبطها النظام على هذا الجهاز", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else if (root) {
                 var pos by remember(value) {
                     mutableFloatStateOf(
@@ -370,8 +370,8 @@ private fun ChargeCard(ui: HealthUi, actions: HealthActions) {
                     },
                 )
                 Row {
-                    Text("Slower, cooler", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-                    Text("Faster", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("أبطأ وأبرد", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+                    Text("أسرع", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -383,18 +383,18 @@ private fun ModuleCard(ui: HealthUi, actions: HealthActions) {
     val c = LocalChartColors.current
     val m = ui.module
     val (text, color, active) = when {
-        ui.root == null -> Triple("Checking…", MaterialTheme.colorScheme.outline, false)
-        ui.root == false -> Triple("Needs root (Magisk)", MaterialTheme.colorScheme.outline, false)
-        m == null || !m.installed -> Triple("Not installed", MaterialTheme.colorScheme.outline, false)
-        !m.enabled -> Triple("Installed but turned off in Magisk", c.warn, false)
-        m.running -> Triple("Running (pid ${m.pid})", c.level, true)
-        else -> Triple("Installed, starts after a reboot", c.warn, false)
+        ui.root == null -> Triple("جارٍ التحقق…", MaterialTheme.colorScheme.outline, false)
+        ui.root == false -> Triple("يحتاج إلى روت (Magisk)", MaterialTheme.colorScheme.outline, false)
+        m == null || !m.installed -> Triple("غير مثبتة", MaterialTheme.colorScheme.outline, false)
+        !m.enabled -> Triple("مثبتة لكنها موقوفة في Magisk", c.warn, false)
+        m.running -> Triple("تعمل (pid ${m.pid})", c.level, true)
+        else -> Triple("مثبتة، تبدأ بعد إعادة التشغيل", c.warn, false)
     }
     SectionCard(
-        "Boot logger",
+        "مسجل الإقلاع",
         Icons.Rounded.RestartAlt,
         tint = c.voltage,
-        subtitle = "Logs from every boot, even before you open the app",
+        subtitle = "سجلات من كل إقلاع، حتى قبل أن تفتح التطبيق",
         trailing = { PulseDot(color, active) },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -404,10 +404,10 @@ private fun ModuleCard(ui: HealthUi, actions: HealthActions) {
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (m?.installed == true) {
-                    OutlinedButton(onClick = actions.removeModule, enabled = !ui.busy) { Text("Remove") }
-                    FilledTonalButton(onClick = actions.installModule, enabled = !ui.busy) { Text("Reinstall") }
+                    OutlinedButton(onClick = actions.removeModule, enabled = !ui.busy) { Text("إزالة") }
+                    FilledTonalButton(onClick = actions.installModule, enabled = !ui.busy) { Text("إعادة التثبيت") }
                 } else {
-                    FilledTonalButton(onClick = actions.installModule, enabled = !ui.busy) { Text("Install") }
+                    FilledTonalButton(onClick = actions.installModule, enabled = !ui.busy) { Text("تثبيت") }
                 }
             }
         }

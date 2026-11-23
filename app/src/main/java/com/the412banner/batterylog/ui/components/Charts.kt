@@ -324,7 +324,7 @@ fun TimeChart(
     showAxes: Boolean = true,
     gapMs: Long = Analysis.GAP_MS,
     animateKey: Any? = null,
-    emptyText: String = "No data yet",
+    emptyText: String = "لا بيانات بعد",
 ) {
     val density = LocalDensity.current
     val measurer = rememberTextMeasurer()

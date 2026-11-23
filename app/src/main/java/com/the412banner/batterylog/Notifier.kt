@@ -28,13 +28,13 @@ object Notifier {
     fun createChannels(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
-            NotificationChannel(CH_LOGGING, "Battery logging", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) },
+            NotificationChannel(CH_LOGGING, "تسجيل البطارية", NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) },
         )
         nm.createNotificationChannel(
-            NotificationChannel(CH_ALERTS, "Battery alerts", NotificationManager.IMPORTANCE_HIGH),
+            NotificationChannel(CH_ALERTS, "تنبيهات البطارية", NotificationManager.IMPORTANCE_HIGH),
         )
         nm.createNotificationChannel(
-            NotificationChannel(CH_UPDATES, "App updates", NotificationManager.IMPORTANCE_DEFAULT),
+            NotificationChannel(CH_UPDATES, "تحديثات التطبيق", NotificationManager.IMPORTANCE_DEFAULT),
         )
     }
 

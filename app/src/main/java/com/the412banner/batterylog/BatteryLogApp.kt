@@ -17,6 +17,16 @@ class BatteryLogApp : Application() {
     lateinit var updates: UpdateRepository
         private set
 
+
+    override fun attachBaseContext(base: Context) {
+        val locale = java.util.Locale("ar")
+        java.util.Locale.setDefault(locale)
+        val config = android.content.res.Configuration(base.resources.configuration)
+        config.setLocale(locale)
+        config.setLayoutDirection(locale)
+        super.attachBaseContext(base.createConfigurationContext(config))
+    }
+
     override fun onCreate() {
         super.onCreate()
         setup(this)

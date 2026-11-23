@@ -54,12 +54,12 @@ class AppMonitorService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            // "Stop apps" from the notification switches the setting off too.
+            // "إيقاف التطبيقات" from the notification switches the setting off too.
             BatteryLogApp.get(this).settings.update { it.copy(perApp = false) }
             stopSelf()
             return START_NOT_STICKY
         }
-        startFg("Starting…")
+        startFg("جارٍ البدء…")
         if (sampler == null) {
             sampler = AppSampler(this)
             _running.value = true
@@ -90,7 +90,7 @@ class AppMonitorService : Service() {
             if (tick == null) {
                 hud?.hide()
                 _access.value = null
-                _lastError.value = "Needs root or Shizuku"
+                _lastError.value = "يحتاج إلى روت أو Shizuku"
                 ServiceNotification.refreshOrCancel(this)
                 nap(if (ShizukuAccess.state.value == ShizukuAccess.State.NotRunning) 30_000 else 5_000)
                 continue

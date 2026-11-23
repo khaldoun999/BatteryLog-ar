@@ -275,8 +275,8 @@ object Analysis {
             val endCap = s.cap[lastI].toInt()
             if (freshBoot && gapMin in 0..20 && endCap > 3) {
                 findings += Finding(
-                    Severity.Warning, "Possible shut-off at $endCap %",
-                    "The log stopped on battery at $endCap % and the device started again about $gapMin min later. A shut-off or a manual restart looks the same here.",
+                    Severity.Warning, "إيقاف محتمل عند $endCap %",
+                    "توقف السجل على البطارية عند $endCap % ثم عاد الجهاز للعمل بعد نحو $gapMin دقيقة. الإيقاف المفاجئ وإعادة التشغيل اليدوية يبدوان متشابهين هنا.",
                 )
             }
         }
@@ -285,19 +285,19 @@ object Analysis {
             val atCap = s.cap[vMinI].toInt()
             if (vMin < floor && atCap > 5) {
                 findings += Finding(
-                    Severity.Warning, "Voltage sag at $atCap %",
-                    "Voltage fell to ${"%.2f".format(vMin / 1000.0)} V (${"%.2f".format(vMin / 1000.0 / cells)} V per cell) while the level still read $atCap %. Low per-cell voltage under load can trigger a shut-off.",
+                    Severity.Warning, "هبوط الجهد عند $atCap %",
+                    "هبط الجهد إلى ${"%.2f".format(vMin / 1000.0)} V (${"%.2f".format(vMin / 1000.0 / cells)} V لكل خلية) بينما كان المستوى ما يزال $atCap %. انخفاض جهد الخلية تحت الحمل قد يسبب إيقافاً مفاجئاً.",
                 )
             }
         }
         if (tN > 0 && tMax >= 48f) {
-            findings += Finding(Severity.Warning, "Hot battery", "The battery reached ${"%.1f".format(tMax)} °C.")
+            findings += Finding(Severity.Warning, "بطارية ساخنة", "وصلت حرارة البطارية إلى ${"%.1f".format(tMax)} °C.")
         }
         val design = stats.designMah
         if (fullMah != null && design != null && fullMah < design * 0.7) {
             findings += Finding(
-                Severity.Warning, "Low measured capacity",
-                "This run measured about ${fullMah.toInt()} mAh for a full charge, ${(fullMah / design * 100).toInt()} % of the ${design} mAh design.",
+                Severity.Warning, "سعة مقاسة منخفضة",
+                "قاست هذه الجلسة نحو ${fullMah.toInt()} mAh لشحنة كاملة، أي ${(fullMah / design * 100).toInt()} % من السعة التصميمية ${design} mAh.",
             )
         }
 

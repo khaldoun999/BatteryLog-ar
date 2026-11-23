@@ -28,10 +28,10 @@ object HudText {
                 HudMetric.GpuMhz -> HudPart("GPU", if (v.gpuMhz.isNaN()) "—\u00A0MHz" else "%.0f\u00A0MHz".format(v.gpuMhz))
                 HudMetric.CpuTemp -> HudPart("CPU", temp(v.cpuC, unit), level(v.cpuC, 85f, 100f))
                 HudMetric.GpuTemp -> HudPart("GPU", temp(v.gpuC, unit), level(v.gpuC, 85f, 100f))
-                HudMetric.CaseTemp -> HudPart("Case", temp(v.caseC, unit), level(v.caseC, 45f, 55f))
-                HudMetric.BattTemp -> HudPart("Bat", temp(v.battC, unit), level(v.battC, 40f, 45f))
-                HudMetric.BattPct -> HudPart("Bat", if (v.battPct in 0..100) "${v.battPct}%" else "—", if (v.battPct in 0..10) 2 else if (v.battPct in 11..20) 1 else 0)
-                HudMetric.Watts -> HudPart("", if (v.charging) "charging" else if (v.watts.isNaN()) "—\u00A0W" else "%.1f\u00A0W".format(kotlin.math.abs(v.watts)))
+                HudMetric.CaseTemp -> HudPart("الهيكل", temp(v.caseC, unit), level(v.caseC, 45f, 55f))
+                HudMetric.BattTemp -> HudPart("البطارية", temp(v.battC, unit), level(v.battC, 40f, 45f))
+                HudMetric.BattPct -> HudPart("البطارية", if (v.battPct in 0..100) "${v.battPct}%" else "—", if (v.battPct in 0..10) 2 else if (v.battPct in 11..20) 1 else 0)
+                HudMetric.Watts -> HudPart("", if (v.charging) "يُشحن" else if (v.watts.isNaN()) "—\u00A0W" else "%.1f\u00A0W".format(kotlin.math.abs(v.watts)))
                 HudMetric.Clock -> HudPart("", SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(v.time)))
             }
         }

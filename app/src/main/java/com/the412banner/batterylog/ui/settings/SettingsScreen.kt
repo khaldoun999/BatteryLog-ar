@@ -106,63 +106,63 @@ fun SettingsContent(settings: AppSettings, serviceActive: Boolean, updateAvailab
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).statusBarsPadding().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text("Settings", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
+        Text("الإعدادات", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
 
-        SectionCard("Appearance", Icons.Rounded.Palette, tint = c.power) {
-            Label("Theme")
-            Segmented(ThemeMode.entries.map { it.name }, ThemeMode.entries.indexOf(s.theme)) { i -> set { it.copy(theme = ThemeMode.entries[i]) } }
+        SectionCard("المظهر", Icons.Rounded.Palette, tint = c.power) {
+            Label("السمة")
+            Segmented(listOf("النظام", "فاتح", "داكن", "أسود"), ThemeMode.entries.indexOf(s.theme)) { i -> set { it.copy(theme = ThemeMode.entries[i]) } }
             if (Build.VERSION.SDK_INT >= 31) {
-                SwitchRow("Wallpaper colours", s.dynamicColor) { v -> set { it.copy(dynamicColor = v) } }
+                SwitchRow("ألوان الخلفية", s.dynamicColor) { v -> set { it.copy(dynamicColor = v) } }
             }
             Spacer(Modifier.height(8.dp))
-            Label("Temperature")
+            Label("الحرارة")
             Segmented(listOf("°C", "°F"), if (s.tempUnit == TempUnit.C) 0 else 1) { i -> set { it.copy(tempUnit = if (i == 0) TempUnit.C else TempUnit.F) } }
         }
 
-        SectionCard("Logging", Icons.Rounded.Tune, tint = c.current) {
-            Label("Record every")
+        SectionCard("التسجيل", Icons.Rounded.Tune, tint = c.current) {
+            Label("التسجيل كل")
             val choices = AppSettings.SAMPLE_CHOICES
-            Segmented(choices.map { "$it s" }, choices.indexOf(s.sampleSeconds).coerceAtLeast(0)) { i -> set { it.copy(sampleSeconds = choices[i]) } }
+            Segmented(choices.map { "$it ث" }, choices.indexOf(s.sampleSeconds).coerceAtLeast(0)) { i -> set { it.copy(sampleSeconds = choices[i]) } }
             Spacer(Modifier.height(6.dp))
-            SwitchRow("Resume after restart", s.resumeAfterRestart) { v -> set { it.copy(resumeAfterRestart = v) } }
+            SwitchRow("الاستئناف بعد إعادة التشغيل", s.resumeAfterRestart) { v -> set { it.copy(resumeAfterRestart = v) } }
             Spacer(Modifier.height(6.dp))
-            Label("Delete logs older than")
+            Label("حذف السجلات الأقدم من")
             val keep = AppSettings.KEEP_CHOICES
-            Segmented(keep.map { if (it == 0) "Never" else "${it}d" }, keep.indexOf(s.keepDays).coerceAtLeast(0)) { i -> set { it.copy(keepDays = keep[i]) } }
+            Segmented(keep.map { if (it == 0) "أبداً" else "${it} يوم" }, keep.indexOf(s.keepDays).coerceAtLeast(0)) { i -> set { it.copy(keepDays = keep[i]) } }
         }
 
-        SectionCard("Alerts", Icons.Rounded.NotificationsActive, tint = c.warn, subtitle = "Work while Auto or Recording is on") {
-            SwitchRow("Charge alarm", s.chargeAlarm, sub = "at ${s.chargeAlarmPct} %") { v -> set { it.copy(chargeAlarm = v) } }
+        SectionCard("التنبيهات", Icons.Rounded.NotificationsActive, tint = c.warn, subtitle = "تعمل أثناء تشغيل الوضع التلقائي أو التسجيل") {
+            SwitchRow("منبه الشحن", s.chargeAlarm, sub = "عند ${s.chargeAlarmPct} %") { v -> set { it.copy(chargeAlarm = v) } }
             AnimatedVisibility(s.chargeAlarm) {
                 IntSlider(s.chargeAlarmPct, 50..100, 5) { v -> set { it.copy(chargeAlarmPct = v) } }
             }
-            SwitchRow("Low battery", s.lowAlert, sub = "at ${s.lowAlertPct} %") { v -> set { it.copy(lowAlert = v) } }
+            SwitchRow("بطارية منخفضة", s.lowAlert, sub = "عند ${s.lowAlertPct} %") { v -> set { it.copy(lowAlert = v) } }
             AnimatedVisibility(s.lowAlert) {
                 IntSlider(s.lowAlertPct, 5..50, 5) { v -> set { it.copy(lowAlertPct = v) } }
             }
-            SwitchRow("Hot battery", s.tempAlert, sub = "at ${Fmt.temp(s.tempAlertC.toDouble(), s.tempUnit)}") { v -> set { it.copy(tempAlert = v) } }
+            SwitchRow("بطارية ساخنة", s.tempAlert, sub = "عند ${Fmt.temp(s.tempAlertC.toDouble(), s.tempUnit)}") { v -> set { it.copy(tempAlert = v) } }
             AnimatedVisibility(s.tempAlert) {
                 IntSlider(s.tempAlertC, 35..60, 1) { v -> set { it.copy(tempAlertC = v) } }
             }
             AnimatedVisibility(s.anyAlert && !serviceActive) {
                 Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Nothing is running right now", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-                    FilledTonalButton(onClick = actions.startAuto) { Text("Turn on Auto") }
+                    Text("لا شيء يعمل الآن", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+                    FilledTonalButton(onClick = actions.startAuto) { Text("تفعيل التلقائي") }
                 }
             }
         }
 
-        SectionCard("Per-app monitoring", Icons.Rounded.Apps, tint = c.temp, subtitle = "Needs root or Shizuku") {
-            SwitchRow("Per-app monitoring", s.perApp) { v -> set { it.copy(perApp = v) } }
+        SectionCard("مراقبة التطبيقات", Icons.Rounded.Apps, tint = c.temp, subtitle = "تحتاج إلى روت أو Shizuku") {
+            SwitchRow("مراقبة كل تطبيق", s.perApp) { v -> set { it.copy(perApp = v) } }
             AnimatedVisibility(s.perApp) {
                 Column {
                     Spacer(Modifier.height(6.dp))
-                    Label("Record every")
+                    Label("التسجيل كل")
                     val pc = AppSettings.PER_APP_CHOICES
-                    Segmented(pc.map { "$it s" }, pc.indexOf(s.perAppSeconds).coerceAtLeast(0)) { i -> set { it.copy(perAppSeconds = pc[i]) } }
+                    Segmented(pc.map { "$it ث" }, pc.indexOf(s.perAppSeconds).coerceAtLeast(0)) { i -> set { it.copy(perAppSeconds = pc[i]) } }
                     Spacer(Modifier.height(6.dp))
-                    SwitchRow("Show all metrics", s.showAllMetrics) { v -> set { it.copy(showAllMetrics = v) } }
-                    SwitchRow("Use Shizuku instead of root", s.perAppShizuku) { v -> set { it.copy(perAppShizuku = v) } }
+                    SwitchRow("إظهار كل المقاييس", s.showAllMetrics) { v -> set { it.copy(showAllMetrics = v) } }
+                    SwitchRow("استخدام Shizuku بدلاً من الروت", s.perAppShizuku) { v -> set { it.copy(perAppShizuku = v) } }
                 }
             }
             Spacer(Modifier.height(6.dp))
@@ -172,21 +172,21 @@ fun SettingsContent(settings: AppSettings, serviceActive: Boolean, updateAvailab
         HudSettingsCard()
 
         SectionCard(
-            "Updates", Icons.Rounded.SystemUpdate, tint = MaterialTheme.colorScheme.primary,
+            "التحديثات", Icons.Rounded.SystemUpdate, tint = MaterialTheme.colorScheme.primary,
             onClick = actions.openUpdates,
             trailing = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (updateAvailable) Pill("New version")
+                    if (updateAvailable) Pill("إصدار جديد")
                     Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null)
                 }
             },
         ) {
-            SwitchRow("Check automatically", s.autoUpdateCheck) { v -> set { it.copy(autoUpdateCheck = v) } }
-            SwitchRow("Include test builds", s.includePrereleases) { v -> set { it.copy(includePrereleases = v) } }
+            SwitchRow("التحقق تلقائياً", s.autoUpdateCheck) { v -> set { it.copy(autoUpdateCheck = v) } }
+            SwitchRow("تضمين الإصدارات التجريبية", s.includePrereleases) { v -> set { it.copy(includePrereleases = v) } }
         }
 
-        SectionCard("About", Icons.Rounded.Code, tint = MaterialTheme.colorScheme.secondary, onClick = actions.openRepo) {
-            Text("BatteryLog ${BuildConfig.VERSION_NAME} (${BuildConfig.GIT_SHA})", style = MaterialTheme.typography.bodyMedium)
+        SectionCard("حول التطبيق", Icons.Rounded.Code, tint = MaterialTheme.colorScheme.secondary, onClick = actions.openRepo) {
+            Text("سجل البطارية ${BuildConfig.VERSION_NAME} (${BuildConfig.GIT_SHA})", style = MaterialTheme.typography.bodyMedium)
             Text("github.com/${BuildConfig.UPDATE_REPO}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.height(16.dp))
@@ -256,12 +256,12 @@ private fun SensorReportButton() {
             if (f != null) {
                 runCatching {
                     ctx.getSystemService(android.content.ClipboardManager::class.java)
-                        .setPrimaryClip(android.content.ClipData.newPlainText("BatteryLog sensor report", f.readText()))
+                        .setPrimaryClip(android.content.ClipData.newPlainText("تقرير حساسات سجل البطارية", f.readText()))
                 }
                 com.the412banner.batterylog.ui.run.shareFile(ctx, f, "text/plain")
             }
         }
-    }) { Text(if (busy) "Reading sensors…" else "Share sensor report") }
+    }) { Text(if (busy) "جارٍ قراءة الحساسات…" else "مشاركة تقرير الحساسات") }
 }
 
 @Composable
@@ -311,10 +311,10 @@ private fun HudSettingsCard() {
         }
     }
     SectionCard(
-        "HUD overlay", Icons.Rounded.Tune, tint = c.temp,
-        subtitle = if (hud.apps.isEmpty()) "No games added" else "On for ${hud.apps.size} app" + if (hud.apps.size == 1) "" else "s",
+        "العارض العلوي", Icons.Rounded.Tune, tint = c.temp,
+        subtitle = if (hud.apps.isEmpty()) "لم تُضف أي لعبة" else "مفعّل في ${hud.apps.size} تطبيق",
     ) {
-        SwitchRow("HUD overlay", hud.enabled) { v ->
+        SwitchRow("العارض العلوي", hud.enabled) { v ->
             set { it.copy(enabled = v) }
             if (v) {
                 // The HUD rides on per-app monitoring (app on screen + sensors).
@@ -325,25 +325,25 @@ private fun HudSettingsCard() {
         AnimatedVisibility(hud.enabled) {
             Column {
                 if (!canDraw) {
-                    FilledTonalButton(onClick = { allowOverlay() }) { Text("Allow display over other apps") }
+                    FilledTonalButton(onClick = { allowOverlay() }) { Text("السماح بالعرض فوق التطبيقات الأخرى") }
                     Spacer(Modifier.height(6.dp))
                 }
-                Label("Position")
-                Segmented(listOf("Top", "Middle", "Bottom"), hud.row) { r -> set { it.at(r, it.col) } }
+                Label("الموضع")
+                Segmented(listOf("الأعلى", "الوسط", "الأسفل"), hud.row) { r -> set { it.at(r, it.col) } }
                 Spacer(Modifier.height(6.dp))
-                Segmented(listOf("Left", "Center", "Right"), hud.col) { c -> set { it.at(it.row, c) } }
+                Segmented(listOf("يسار", "وسط", "يمين"), hud.col) { c -> set { it.at(it.row, c) } }
                 Spacer(Modifier.height(8.dp))
-                Label("Layout")
-                Segmented(listOf("Horizontal", "Vertical"), if (hud.oneLine) 0 else 1) { i -> set { it.copy(oneLine = i == 0) } }
+                Label("التخطيط")
+                Segmented(listOf("أفقي", "عمودي"), if (hud.oneLine) 0 else 1) { i -> set { it.copy(oneLine = i == 0) } }
                 Spacer(Modifier.height(8.dp))
-                Label("Size")
-                Segmented(listOf("Small", "Medium", "Large"), hud.size) { i -> set { it.copy(size = i) } }
+                Label("الحجم")
+                Segmented(listOf("صغير", "متوسط", "كبير"), hud.size) { i -> set { it.copy(size = i) } }
                 Spacer(Modifier.height(8.dp))
-                Label("Background ${hud.opacity} %")
+                Label("الخلفية ${hud.opacity} %")
                 IntSlider(hud.opacity, 0..100, 10) { v -> set { it.copy(opacity = v) } }
-                SwitchRow("Lock position", hud.locked, sub = if (hud.locked) "Touches go through to the game" else "Drag the HUD to move it") { v -> set { it.copy(locked = v) } }
+                SwitchRow("قفل الموضع", hud.locked, sub = if (hud.locked) "اللمسات تمر إلى اللعبة" else "اسحب العارض لنقله") { v -> set { it.copy(locked = v) } }
                 Spacer(Modifier.height(8.dp))
-                Label("Games")
+                Label("الألعاب")
                 com.the412banner.batterylog.ui.hud.HudAppsSection()
             }
         }

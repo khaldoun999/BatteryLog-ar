@@ -12,8 +12,8 @@ import kotlinx.serialization.json.Json
 @Serializable
 enum class HudMetric(val label: String) {
     Fps("FPS"), Cpu("CPU %"), Gpu("GPU %"), GpuMhz("GPU MHz"),
-    CpuTemp("CPU °"), GpuTemp("GPU °"), CaseTemp("Case °"), BattTemp("Battery °"),
-    BattPct("Battery %"), Watts("Watts"), Clock("Clock"),
+    CpuTemp("CPU °"), GpuTemp("GPU °"), CaseTemp("الهيكل °"), BattTemp("البطارية °"),
+    BattPct("البطارية %"), Watts("الواط"), Clock("الساعة"),
 }
 
 /** HUD look + which apps show it (and with which metrics). */

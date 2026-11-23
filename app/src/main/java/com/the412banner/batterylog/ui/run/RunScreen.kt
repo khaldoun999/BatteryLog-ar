@@ -130,15 +130,15 @@ fun RunScreen(path: String, back: () -> Unit) {
     if (confirmDelete) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
-            title = { Text("Delete this log?") },
-            text = { Text(ui.info?.name.orEmpty() + "\nThis can't be undone.") },
+            title = { Text("حذف هذا السجل؟") },
+            text = { Text(ui.info?.name.orEmpty() + "\nلا يمكن التراجع عن هذا.") },
             confirmButton = {
                 TextButton(onClick = {
                     confirmDelete = false
                     scope.launch { if (vm.delete()) back() }
-                }) { Text("Delete") }
+                }) { Text("حذف") }
             },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("إلغاء") } },
         )
     }
 }
@@ -159,25 +159,25 @@ fun RunContent(
             TopAppBar(
                 title = {
                     Column {
-                        Text(ui.info?.start?.takeIf { it > 0 }?.let { Fmt.relativeDateTime(it) } ?: "Log", style = MaterialTheme.typography.titleLarge)
+                        Text(ui.info?.start?.takeIf { it > 0 }?.let { Fmt.relativeDateTime(it) } ?: "سجل", style = MaterialTheme.typography.titleLarge)
                         ui.info?.let {
                             Text(it.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 },
-                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") } },
+                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "رجوع") } },
                 actions = {
-                    IconButton(onClick = onShareReport, enabled = ui.report != null) { Icon(Icons.Rounded.Share, "Share report") }
+                    IconButton(onClick = onShareReport, enabled = ui.report != null) { Icon(Icons.Rounded.Share, "مشاركة التقرير") }
                     Box {
-                        IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, "More") }
+                        IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, "المزيد") }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                             DropdownMenuItem(
-                                text = { Text("Share CSV file") },
+                                text = { Text("مشاركة ملف CSV") },
                                 leadingIcon = { Icon(Icons.Rounded.Description, null) },
                                 onClick = { menu = false; onShareCsv() },
                             )
                             DropdownMenuItem(
-                                text = { Text("Delete log") },
+                                text = { Text("حذف السجل") },
                                 leadingIcon = { Icon(Icons.Rounded.Delete, null) },
                                 onClick = { menu = false; onDelete() },
                             )
@@ -195,7 +195,7 @@ fun RunContent(
         val r = ui.report
         val info = ui.info
         if (r == null || info == null) {
-            Box(Modifier.fillMaxSize().padding(pad), contentAlignment = Alignment.Center) { Text("This log is no longer there.") }
+            Box(Modifier.fillMaxSize().padding(pad), contentAlignment = Alignment.Center) { Text("لم يعد هذا السجل موجوداً.") }
             return@Scaffold
         }
         val c = LocalChartColors.current
@@ -206,14 +206,14 @@ fun RunContent(
         ) {
             AppCard {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    MiniStat("Duration", Fmt.duration(r.durationMs))
-                    MiniStat("Level", "${r.startCap} → ${r.endCap} %")
-                    MiniStat("Used", batteriesValue(r.drained), color = c.drain, sub = batteriesSub(r.drained))
-                    MiniStat("Charged", batteriesValue(r.charged), color = c.charging, sub = batteriesSub(r.charged))
+                    MiniStat("المدة", Fmt.duration(r.durationMs))
+                    MiniStat("المستوى", "${r.startCap} → ${r.endCap} %")
+                    MiniStat("استُخدم", batteriesValue(r.drained), color = c.drain, sub = batteriesSub(r.drained))
+                    MiniStat("شُحن", batteriesValue(r.charged), color = c.charging, sub = batteriesSub(r.charged))
                 }
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    (if (info.kind == LogKind.Boot) "Boot log · " else "") + "${info.count} samples · ${Fmt.dateTime(info.start)} → ${Fmt.time(info.end)}",
+                    (if (info.kind == LogKind.Boot) "سجل إقلاع · " else "") + "${info.count} عينة · ${Fmt.dateTime(info.start)} → ${Fmt.time(info.end)}",
                     style = MaterialTheme.typography.bodySmall.merge(NumberStyle), color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -247,42 +247,42 @@ fun RunContent(
                 }
             }
 
-            SectionCard("Capacity", Icons.Rounded.Insights, tint = c.level) {
-                InfoRow("Used on battery", r.usedMah?.let { "%,.0f mAh".format(it) } ?: "—")
-                InfoRow("Measured full charge", r.fullMah?.let { "%,.0f mAh".format(it) } ?: "needs ≥ 5 % drop")
-                InfoRow("Design capacity", r.designMah?.let { "%,d mAh".format(it) } ?: "unknown")
-                InfoRow("Fuel gauge full", r.kernelFullMah?.let { "%,d mAh".format(it) } ?: "unknown")
-                r.sohPct?.let { InfoRow("Health from this run", "%.0f %%".format(it), valueColor = if (it < 70) c.bad else c.level) }
+            SectionCard("السعة", Icons.Rounded.Insights, tint = c.level) {
+                InfoRow("استُخدم على البطارية", r.usedMah?.let { "%,.0f mAh".format(it) } ?: "—")
+                InfoRow("الشحنة الكاملة المقاسة", r.fullMah?.let { "%,.0f mAh".format(it) } ?: "يحتاج إلى هبوط ≥ 5 %")
+                InfoRow("السعة التصميمية", r.designMah?.let { "%,d mAh".format(it) } ?: "غير معروف")
+                InfoRow("مقياس الوقود الكامل", r.kernelFullMah?.let { "%,d mAh".format(it) } ?: "غير معروف")
+                r.sohPct?.let { InfoRow("الصحة من هذه الجلسة", "%.0f %%".format(it), valueColor = if (it < 70) c.bad else c.level) }
             }
-            SectionCard("Voltage", Metric.Voltage.icon, tint = c.voltage, subtitle = "${r.cells}S pack") {
-                InfoRow("Start → end", "${r.vStart?.let { Fmt.volts(it) } ?: "—"} → ${r.vEnd?.let { Fmt.volts(it) } ?: "—"}")
-                InfoRow("Lowest", r.vMin?.let { "${Fmt.volts(it)} at ${r.vMinAtCap} %" } ?: "—")
-                r.vMin?.let { InfoRow("Lowest per cell", "%.3f V".format(it / 1000.0 / r.cells)) }
-                InfoRow("Highest", r.vMax?.let { Fmt.volts(it) } ?: "—")
+            SectionCard("الجهد", Metric.Voltage.icon, tint = c.voltage, subtitle = "حزمة ${r.cells}S") {
+                InfoRow("البداية ← النهاية", "${r.vStart?.let { Fmt.volts(it) } ?: "—"} → ${r.vEnd?.let { Fmt.volts(it) } ?: "—"}")
+                InfoRow("الأدنى", r.vMin?.let { "${Fmt.volts(it)} عند ${r.vMinAtCap} %" } ?: "—")
+                r.vMin?.let { InfoRow("الأدنى لكل خلية", "%.3f V".format(it / 1000.0 / r.cells)) }
+                InfoRow("الأعلى", r.vMax?.let { Fmt.volts(it) } ?: "—")
                 if (r.curve.size >= 2) {
                     Spacer(Modifier.height(8.dp))
                     VoltageCurve(r.curve, c.voltage)
                 }
             }
-            SectionCard("Power & current", Metric.Power.icon, tint = c.power) {
-                InfoRow("Average draw", r.avgDrainW?.let { Fmt.watts(it) } ?: "—")
-                InfoRow("Peak draw", r.peakDrainW?.let { Fmt.watts(it) } ?: "—")
-                InfoRow("Average current", r.avgDrainMa?.let { Fmt.ma(it) } ?: "—")
-                InfoRow("Peak current", r.peakDrainMa?.let { "${Fmt.ma(it)} at ${r.peakDrainAtCap} %" } ?: "—")
+            SectionCard("الطاقة والتيار", Metric.Power.icon, tint = c.power) {
+                InfoRow("متوسط السحب", r.avgDrainW?.let { Fmt.watts(it) } ?: "—")
+                InfoRow("ذروة السحب", r.peakDrainW?.let { Fmt.watts(it) } ?: "—")
+                InfoRow("متوسط التيار", r.avgDrainMa?.let { Fmt.ma(it) } ?: "—")
+                InfoRow("ذروة التيار", r.peakDrainMa?.let { "${Fmt.ma(it)} عند ${r.peakDrainAtCap} %" } ?: "—")
                 if (r.avgChargeW != null) {
-                    InfoRow("Average charging", Fmt.watts(r.avgChargeW))
-                    InfoRow("Peak charging", r.peakChargeW?.let { Fmt.watts(it) } ?: "—")
+                    InfoRow("متوسط الشحن", Fmt.watts(r.avgChargeW))
+                    InfoRow("ذروة الشحن", r.peakChargeW?.let { Fmt.watts(it) } ?: "—")
                 }
             }
-            SectionCard("Speed", Icons.Rounded.Insights, tint = c.current) {
-                InfoRow("Drain", r.drainPctPerH?.let { "%.1f %%/h".format(it) } ?: "—")
-                InfoRow("Full charge would last", r.drainPctPerH?.takeIf { it > 0 }?.let { Fmt.duration((100 / it * 3_600_000).toLong()) } ?: "—")
-                InfoRow("Charging", r.chargePctPerH?.let { "%.1f %%/h".format(it) } ?: "—")
+            SectionCard("السرعة", Icons.Rounded.Insights, tint = c.current) {
+                InfoRow("التفريغ", r.drainPctPerH?.let { "%.1f %%/س".format(it) } ?: "—")
+                InfoRow("الشحنة الكاملة ستدوم", r.drainPctPerH?.takeIf { it > 0 }?.let { Fmt.duration((100 / it * 3_600_000).toLong()) } ?: "—")
+                InfoRow("الشحن", r.chargePctPerH?.let { "%.1f %%/س".format(it) } ?: "—")
             }
-            SectionCard("Temperature", Metric.Temp.icon, tint = c.temp) {
-                InfoRow("Lowest", r.tMin?.let { Fmt.temp(it.toDouble(), unit) } ?: "—")
-                InfoRow("Average", r.tAvg?.let { Fmt.temp(it.toDouble(), unit) } ?: "—")
-                InfoRow("Highest", r.tMax?.let { Fmt.temp(it.toDouble(), unit) } ?: "—", valueColor = if ((r.tMax ?: 0f) >= 45f) c.bad else MaterialTheme.colorScheme.onSurface)
+            SectionCard("الحرارة", Metric.Temp.icon, tint = c.temp) {
+                InfoRow("الأدنى", r.tMin?.let { Fmt.temp(it.toDouble(), unit) } ?: "—")
+                InfoRow("المتوسط", r.tAvg?.let { Fmt.temp(it.toDouble(), unit) } ?: "—")
+                InfoRow("الأعلى", r.tMax?.let { Fmt.temp(it.toDouble(), unit) } ?: "—", valueColor = if ((r.tMax ?: 0f) >= 45f) c.bad else MaterialTheme.colorScheme.onSurface)
             }
             Spacer(Modifier.height(16.dp))
         }
@@ -297,7 +297,7 @@ private fun Findings(r: Analysis.Report) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconBadge(Icons.Rounded.CheckCircle, c.level)
                 Spacer(Modifier.width(12.dp))
-                Text("Nothing unusual in this log", style = MaterialTheme.typography.titleSmall)
+                Text("لا شيء غير معتاد في هذا السجل", style = MaterialTheme.typography.titleSmall)
             }
         }
         return
@@ -358,6 +358,6 @@ fun shareReport(context: Context, report: Analysis.Report, unit: TempUnit) {
         File(csv.parentFile, csv.nameWithoutExtension + "_report.txt").writeText(text)
     }
     val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
-        .putExtra(Intent.EXTRA_SUBJECT, "BatteryLog report")
-    runCatching { context.startActivity(Intent.createChooser(send, "Share report").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        .putExtra(Intent.EXTRA_SUBJECT, "تقرير سجل البطارية")
+    runCatching { context.startActivity(Intent.createChooser(send, "مشاركة التقرير").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
 }

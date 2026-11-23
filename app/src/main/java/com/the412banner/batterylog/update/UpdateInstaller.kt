@@ -63,7 +63,7 @@ class InstallResultReceiver : BroadcastReceiver() {
             PackageInstaller.STATUS_SUCCESS -> updates.installFinished(true, null)
             else -> updates.installFinished(
                 false,
-                intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "Install failed (status $status)",
+                intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "فشل التثبيت (الحالة $status)",
             )
         }
     }

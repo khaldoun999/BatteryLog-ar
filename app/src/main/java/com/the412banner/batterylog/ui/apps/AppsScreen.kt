@@ -62,7 +62,7 @@ import java.time.ZoneId
 
 /** Periods offered on the Apps screens. */
 enum class Period(val label: String) {
-    Today("Today"), Day("24 h"), Week("7 days");
+    Today("اليوم"), Day("24 س"), Week("7 أيام");
 
     fun range(now: Long = System.currentTimeMillis()): LongRange = when (this) {
         Today -> LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()..now
@@ -71,7 +71,7 @@ enum class Period(val label: String) {
     }
 }
 
-enum class SortBy(val label: String) { Energy("Battery"), Screen("Screen"), Cpu("CPU"), Memory("RAM"), Gpu("GPU") }
+enum class SortBy(val label: String) { Energy("البطارية"), Screen("الشاشة"), Cpu("CPU"), Memory("RAM"), Gpu("GPU") }
 
 private val iconCache = HashMap<String, ImageBitmap?>()
 
@@ -120,28 +120,28 @@ fun AppsScreen(openApp: (String) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            Text("Apps", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
+            Text("التطبيقات", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
         }
         item {
             SectionCard(
-                "Per-app monitoring", Icons.Rounded.Apps, tint = c.temp,
+                "مراقبة التطبيقات", Icons.Rounded.Apps, tint = c.temp,
                 subtitle = when {
-                    !settings.perApp -> "Off"
+                    !settings.perApp -> "متوقفة"
                     error != null -> error
-                    running -> "Recording every ${settings.perAppSeconds} s" + (access?.let { " · $it" } ?: "")
-                    else -> "Starting…"
+                    running -> "تسجل كل ${settings.perAppSeconds} ث" + (access?.let { " · $it" } ?: "")
+                    else -> "جارٍ البدء…"
                 },
                 trailing = { PulseDot(c.temp, active = settings.perApp && running && error == null) },
             ) {
                 if (!settings.perApp) {
-                    FilledTonalButton(onClick = { app.settings.update { it.copy(perApp = true) } }) { Text("Turn on") }
+                    FilledTonalButton(onClick = { app.settings.update { it.copy(perApp = true) } }) { Text("تفعيل") }
                 } else if (error != null && shizuku == com.the412banner.batterylog.apps.ShizukuAccess.State.NeedsPermission) {
-                    FilledTonalButton(onClick = { com.the412banner.batterylog.apps.ShizukuAccess.requestPermission() }) { Text("Allow Shizuku") }
+                    FilledTonalButton(onClick = { com.the412banner.batterylog.apps.ShizukuAccess.requestPermission() }) { Text("السماح لـ Shizuku") }
                 } else latest?.let { t ->
                     val unit = settings.tempUnit
                     Text(
-                        (if (t.fg.isEmpty()) "Screen off" else appLabel(ctx, t.fg)) + " · " +
-                            (if (t.drawW.isNaN()) "charging" else Fmt.watts(t.drawW)) +
+                        (if (t.fg.isEmpty()) "الشاشة مطفأة" else appLabel(ctx, t.fg)) + " · " +
+                            (if (t.drawW.isNaN()) "يُشحن" else Fmt.watts(t.drawW)) +
                             " · CPU ${"%.0f".format(t.cpuPct)}% · GPU ${"%.0f".format(t.gpuPct)}%" +
                             (if (!t.cpuC.isNaN()) " · " + Fmt.tempShort(t.cpuC.toDouble(), unit) else ""),
                         style = MaterialTheme.typography.bodyMedium,
@@ -154,7 +154,7 @@ fun AppsScreen(openApp: (String) -> Unit) {
         if (list != null && sorted.isEmpty()) {
             item {
                 Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Text(if (settings.perApp) "No app activity recorded yet" else "Turn on per-app monitoring to see apps",
+                    Text(if (settings.perApp) "لم يُسجل نشاط لأي تطبيق بعد" else "فعّل مراقبة التطبيقات لرؤية التطبيقات",
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -186,13 +186,13 @@ private fun AppRow(s: AppSummary, sort: SortBy, top: Double, onClick: () -> Unit
             Column(Modifier.weight(1f)) {
                 Text(label, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    "Screen ${Fmt.duration(s.fgMs)}" +
-                        (if (s.fgMs > 0 && s.energyMj <= 0.0) " · on charger" else if (s.energyMj > 0.0) " · ${"%.2f".format(s.energyWh)} Wh" else "") +
-                        (if (s.drawW.n > 0) " · avg ${Fmt.watts(s.drawW.avg.toDouble())}" else ""),
+                    "الشاشة ${Fmt.duration(s.fgMs)}" +
+                        (if (s.fgMs > 0 && s.energyMj <= 0.0) " · على الشاحن" else if (s.energyMj > 0.0) " · ${"%.2f".format(s.energyWh)} Wh" else "") +
+                        (if (s.drawW.n > 0) " · المتوسط ${Fmt.watts(s.drawW.avg.toDouble())}" else ""),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
                 )
                 Text(
-                    "CPU ${Fmt.duration(s.cpuMs)} · RAM ${mb(s.rssMaxKb)} · GPU mem ${mb(s.gpuMaxKb)}",
+                    "CPU ${Fmt.duration(s.cpuMs)} · RAM ${mb(s.rssMaxKb)} · ذاكرة GPU ${mb(s.gpuMaxKb)}",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
                 )
             }

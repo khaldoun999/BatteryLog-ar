@@ -51,7 +51,7 @@ class HudOverlay(private val ctx: Context) {
             PixelFormat.TRANSLUCENT,
         )
         if (Build.VERSION.SDK_INT >= 28) p.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        p.title = "BatteryLog HUD"
+        p.title = "عارض سجل البطارية"
         params = p
         view = v
         style(v, cfg)

@@ -173,9 +173,9 @@ fun NowContent(ui: NowUi, actions: NowActions, chart: ChartState = rememberChart
                     Icon(Icons.Rounded.FolderOpen, null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Keep logs safe", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                        Text("حافظ على سلامة السجلات", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onTertiaryContainer)
                         Text(
-                            "Allow file access so logs are kept in /sdcard/BatteryLog and survive a reinstall.",
+                            "اسمح بالوصول إلى الملفات حتى تُحفظ السجلات في /sdcard/BatteryLog وتبقى بعد إعادة التثبيت.",
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onTertiaryContainer,
                         )
                     }
@@ -198,30 +198,30 @@ fun NowContent(ui: NowUi, actions: NowActions, chart: ChartState = rememberChart
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(
-                "Power", if (b.watts.isNaN()) "—" else Fmt.watts(b.watts), Metric.Power.icon,
+                "الطاقة", if (b.watts.isNaN()) "—" else Fmt.watts(b.watts), Metric.Power.icon,
                 if (b.watts >= 0) c.charging else c.power, Modifier.weight(1f),
                 sub = when {
                     b.watts.isNaN() -> null
-                    b.watts >= 0 -> "into battery"
-                    else -> "from battery"
+                    b.watts >= 0 -> "إلى البطارية"
+                    else -> "من البطارية"
                 },
                 spark = spark({ it.watts }, Metric.Power),
             )
             StatTile(
-                "Current", Fmt.ma(b.currentMa), Metric.Current.icon, c.current, Modifier.weight(1f),
-                sub = if (!b.avgCurrentMa.isNaN()) "avg ${Fmt.ma(b.avgCurrentMa)}" else null,
+                "التيار", Fmt.ma(b.currentMa), Metric.Current.icon, c.current, Modifier.weight(1f),
+                sub = if (!b.avgCurrentMa.isNaN()) "المتوسط ${Fmt.ma(b.avgCurrentMa)}" else null,
                 spark = spark({ it.currentMa }, Metric.Current),
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(
-                "Voltage", Fmt.volts(b.voltageMv), Metric.Voltage.icon, c.voltage, Modifier.weight(1f),
+                "الجهد", Fmt.volts(b.voltageMv), Metric.Voltage.icon, c.voltage, Modifier.weight(1f),
                 sub = b.technology.ifBlank { null },
                 spark = spark({ it.voltageMv / 1000.0 }, Metric.Voltage),
             )
             StatTile(
-                "Temperature", Fmt.temp(b.tempC, unit), Metric.Temp.icon, c.temp, Modifier.weight(1f),
-                sub = "health ${b.health.lowercase()}",
+                "الحرارة", Fmt.temp(b.tempC, unit), Metric.Temp.icon, c.temp, Modifier.weight(1f),
+                sub = "الصحة: ${b.health}",
                 spark = spark({ x -> if (unit == com.the412banner.batterylog.TempUnit.F) x.tempC * 9 / 5 + 32 else x.tempC }, Metric.Temp),
             )
         }
@@ -237,15 +237,15 @@ fun NowContent(ui: NowUi, actions: NowActions, chart: ChartState = rememberChart
 private fun Header(ui: NowUi) {
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text("BatteryLog", style = MaterialTheme.typography.headlineMedium)
+            Text("سجل البطارية", style = MaterialTheme.typography.headlineMedium)
             Text(ui.model, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         val s = ui.service
         val c = LocalChartColors.current
         when {
-            s.recording -> Pill("Recording", c.bad)
-            s.auto -> Pill("Auto", MaterialTheme.colorScheme.secondary)
-            else -> Pill("Idle", MaterialTheme.colorScheme.outline)
+            s.recording -> Pill("يسجل", c.bad)
+            s.auto -> Pill("تلقائي", MaterialTheme.colorScheme.secondary)
+            else -> Pill("خامل", MaterialTheme.colorScheme.outline)
         }
     }
 }
@@ -269,7 +269,7 @@ private fun Hero(ui: NowUi) {
                     Text("%", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 10.dp, start = 2.dp))
                 }
                 val status = buildString {
-                    append(if (b.onCharger) (if (b.isCharging) "Charging" else b.status) else "On battery")
+                    append(if (b.onCharger) (if (b.isCharging) "يُشحن" else b.status) else "على البطارية")
                     if (!b.watts.isNaN()) append(" · ").append(Fmt.watts(b.watts))
                 }
                 Text(status, style = MaterialTheme.typography.bodyMedium.merge(NumberStyle), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -280,12 +280,12 @@ private fun Hero(ui: NowUi) {
             Spacer(Modifier.height(4.dp))
             Row(Modifier.fillMaxWidth().animateContentSize(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 if (e.charging) {
-                    EstimateItem("Full in", Estimates.fmtMin(e.gaugeToFullMin), "system")
-                    EstimateItem("Your average", Estimates.fmtMin(e.learnedToFullMin), e.rates?.chargePctPerH?.let { "%.0f %%/h".format(it) } ?: "learning")
+                    EstimateItem("تمتلئ خلال", Estimates.fmtMin(e.gaugeToFullMin), "النظام")
+                    EstimateItem("متوسطك", Estimates.fmtMin(e.learnedToFullMin), e.rates?.chargePctPerH?.let { "%.0f %%/س".format(it) } ?: "جارٍ التعلم")
                 } else {
-                    EstimateItem("Time left", Estimates.fmtMin(e.gaugeToEmptyMin), "system")
-                    EstimateItem("Your average", Estimates.fmtMin(e.learnedRemainingMin), e.rates?.drainPctPerH?.let { "%.1f %%/h".format(it) } ?: "learning")
-                    EstimateItem("Full charge", Estimates.fmtMin(e.learnedFullRuntimeMin), "100 → 0 %")
+                    EstimateItem("الوقت المتبقي", Estimates.fmtMin(e.gaugeToEmptyMin), "النظام")
+                    EstimateItem("متوسطك", Estimates.fmtMin(e.learnedRemainingMin), e.rates?.drainPctPerH?.let { "%.1f %%/س".format(it) } ?: "جارٍ التعلم")
+                    EstimateItem("شحنة كاملة", Estimates.fmtMin(e.learnedFullRuntimeMin), "100 → 0 %")
                 }
             }
         }
@@ -306,16 +306,16 @@ private fun SessionCard(s: Analysis.Session) {
     val c = LocalChartColors.current
     val color = if (s.charging) c.charging else c.drain
     SectionCard(
-        title = if (s.charging) "Charging since ${Fmt.time(s.since)}" else "On battery since ${Fmt.time(s.since)}",
+        title = if (s.charging) "يُشحن منذ ${Fmt.time(s.since)}" else "على البطارية منذ ${Fmt.time(s.since)}",
         icon = if (s.charging) Icons.Rounded.Power else Icons.Rounded.Timeline,
         tint = color,
         subtitle = Fmt.relativeDateTime(s.since),
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            MiniStat("Level", "${s.fromPct} → ${s.nowPct} %")
-            MiniStat("Change", (if (s.deltaPct > 0) "+" else "") + "${s.deltaPct} %", color = color)
-            MiniStat("Time", Fmt.duration(s.elapsedMs))
-            MiniStat("Rate", s.ratePctPerH?.let { "%.1f %%/h".format(it) } ?: "—")
+            MiniStat("المستوى", "${s.fromPct} → ${s.nowPct} %")
+            MiniStat("التغير", (if (s.deltaPct > 0) "+" else "") + "${s.deltaPct} %", color = color)
+            MiniStat("الوقت", Fmt.duration(s.elapsedMs))
+            MiniStat("المعدل", s.ratePctPerH?.let { "%.1f %%/س".format(it) } ?: "—")
         }
     }
 }
@@ -328,10 +328,10 @@ private fun RecentChart(ui: NowUi, chart: ChartState, openHistory: () -> Unit) {
     val series = remember(ui.recent, metric, unit) { metric.series(ui.recent, unit) }
     val bands = remember(ui.recent) { Analysis.chargingBands(ui.recent) }
     SectionCard(
-        title = "Last 24 hours",
+        title = "آخر 24 ساعة",
         icon = Icons.Rounded.History,
         tint = metric.color(c),
-        trailing = { androidx.compose.material3.TextButton(onClick = openHistory) { Text("History") } },
+        trailing = { androidx.compose.material3.TextButton(onClick = openHistory) { Text("السجل") } },
     ) {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(Metric.Level, Metric.Power, Metric.Temp, Metric.Voltage).forEach { m ->
@@ -359,11 +359,11 @@ private fun RecentChart(ui: NowUi, chart: ChartState, openHistory: () -> Unit) {
             minRange = metric.minRange,
             live = ui.service.recording,
             animateKey = metric,
-            emptyText = "Nothing logged in the last 24 hours",
+            emptyText = "لم يُسجل شيء في آخر 24 ساعة",
             modifier = Modifier.fillMaxWidth().height(190.dp),
         )
         AnimatedVisibility(chart.zoomed) {
-            androidx.compose.material3.TextButton(onClick = { chart.reset() }) { Text("Reset zoom") }
+            androidx.compose.material3.TextButton(onClick = { chart.reset() }) { Text("إعادة التكبير") }
         }
     }
 }
@@ -373,22 +373,22 @@ private fun LoggingCard(ui: NowUi, actions: NowActions) {
     val s = ui.service
     val c = LocalChartColors.current
     SectionCard(
-        title = "Logging",
+        title = "التسجيل",
         icon = Icons.Rounded.FiberManualRecord,
         tint = if (s.recording) c.bad else MaterialTheme.colorScheme.secondary,
         subtitle = when {
-            s.recording && s.auto -> "Auto: recording this discharge"
-            s.recording -> "Recording every ${s.intervalSec} s"
-            s.auto -> "Auto: starts when you unplug"
-            else -> "Not logging"
+            s.recording && s.auto -> "تلقائي: يسجل هذا التفريغ"
+            s.recording -> "يسجل كل ${s.intervalSec} ث"
+            s.auto -> "تلقائي: يبدأ عند فصل الشاحن"
+            else -> "لا يسجل"
         },
         trailing = { PulseDot(if (s.recording) c.bad else MaterialTheme.colorScheme.outline, s.recording) },
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Auto mode", style = MaterialTheme.typography.titleSmall)
+                Text("الوضع التلقائي", style = MaterialTheme.typography.titleSmall)
                 Text(
-                    "Logs every discharge on its own",
+                    "يسجل كل تفريغ من تلقاء نفسه",
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -398,21 +398,21 @@ private fun LoggingCard(ui: NowUi, actions: NowActions) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             if (s.recording && !s.auto) {
                 Button(onClick = actions.stop, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Rounded.Stop, null); Spacer(Modifier.width(6.dp)); Text("Stop")
+                    Icon(Icons.Rounded.Stop, null); Spacer(Modifier.width(6.dp)); Text("إيقاف")
                 }
             } else if (!s.recording) {
                 FilledTonalButton(onClick = actions.record, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Rounded.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("Record now")
+                    Icon(Icons.Rounded.PlayArrow, null); Spacer(Modifier.width(6.dp)); Text("سجل الآن")
                 }
             }
             if (s.active) {
-                OutlinedButton(onClick = actions.stop, modifier = Modifier.weight(1f)) { Text("Turn off") }
+                OutlinedButton(onClick = actions.stop, modifier = Modifier.weight(1f)) { Text("إيقاف الكل") }
             }
         }
         if (s.recording && s.logPath != null) {
             Spacer(Modifier.height(10.dp))
             Text(
-                "${java.io.File(s.logPath).name} · ${s.samples} samples · since ${Fmt.time(s.startedAt)}",
+                "${java.io.File(s.logPath).name} · ${s.samples} عينة · منذ ${Fmt.time(s.startedAt)}",
                 style = MaterialTheme.typography.bodySmall.merge(NumberStyle), color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

@@ -21,10 +21,10 @@ class BatteryTileService : TileService() {
         val tile = qsTile ?: return
         val b = BatteryInfo.read(this)
         val s = BatteryLogService.state.value
-        tile.label = if (b.capacityPct >= 0) "${b.capacityPct} %" else "BatteryLog"
+        tile.label = if (b.capacityPct >= 0) "${b.capacityPct} %" else "سجل البطارية"
         val sub = buildList {
             if (!b.watts.isNaN()) add(Fmt.watts(b.watts))
-            add(if (b.onCharger) "charging" else "on battery")
+            add(if (b.onCharger) "يُشحن" else "على البطارية")
         }.joinToString(" · ")
         if (Build.VERSION.SDK_INT >= 29) tile.subtitle = sub
         tile.state = if (s.recording || s.auto) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE

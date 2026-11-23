@@ -25,8 +25,8 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
         prefs.edit().putString("notified", tag).apply()
         Notifier.show(
             applicationContext, Notifier.ID_UPDATE, Notifier.CH_UPDATES,
-            "BatteryLog ${release.tag} is available",
-            "Tap to see what's new and install it.",
+            "يتوفر إصدار جديد من سجل البطارية ${release.tag}",
+            "انقر لمعرفة الجديد وتثبيته.",
             route = "updates",
         )
         return Result.success()

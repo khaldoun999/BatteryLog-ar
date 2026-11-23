@@ -50,11 +50,11 @@ import com.the412banner.batterylog.ui.settings.UpdatesScreen
 import kotlinx.coroutines.flow.StateFlow
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector) {
-    Now("now", "Now", Icons.Rounded.BatteryChargingFull),
-    History("history", "History", Icons.Rounded.Insights),
-    Apps("apps", "Apps", Icons.Rounded.Apps),
-    Health("health", "Health", Icons.Rounded.Favorite),
-    Settings("settings", "Settings", Icons.Rounded.Settings),
+    Now("now", "الآن", Icons.Rounded.BatteryChargingFull),
+    History("history", "السجل", Icons.Rounded.Insights),
+    Apps("apps", "التطبيقات", Icons.Rounded.Apps),
+    Health("health", "الصحة", Icons.Rounded.Favorite),
+    Settings("settings", "الإعدادات", Icons.Rounded.Settings),
 }
 
 @Composable

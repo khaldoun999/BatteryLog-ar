@@ -24,11 +24,11 @@ object ServiceNotification {
         val appsOn = AppMonitorService.running.value
         val unit = BatteryLogApp.get(ctx).settings.current().tempUnit
         val title = when {
-            bs.auto && bs.recording -> "Auto · recording on battery"
-            bs.auto -> "Auto · waiting for unplug"
-            bs.recording -> "Recording"
-            appsOn -> "Per-app monitoring"
-            else -> "BatteryLog"
+            bs.auto && bs.recording -> "تلقائي · يسجل على البطارية"
+            bs.auto -> "تلقائي · بانتظار فصل الشاحن"
+            bs.recording -> "يسجل"
+            appsOn -> "مراقبة التطبيقات"
+            else -> "سجل البطارية"
         }
         val battery = buildList {
             if (b.capacityPct >= 0) add("${b.capacityPct} %")
@@ -38,12 +38,12 @@ object ServiceNotification {
         }.joinToString("  ·  ")
         val apps = if (!appsOn) null else AppMonitorService.lastError.value ?: AppMonitorService.latest.value?.let { t ->
             buildList {
-                add(if (t.fg.isEmpty()) "Screen off" else label(ctx, t.fg))
+                add(if (t.fg.isEmpty()) "الشاشة مطفأة" else label(ctx, t.fg))
                 if (!t.cpuPct.isNaN()) add("CPU ${"%.0f".format(t.cpuPct)}%")
                 if (!t.gpuPct.isNaN()) add("GPU ${"%.0f".format(t.gpuPct)}%")
                 if (!t.cpuC.isNaN()) add(Fmt.tempShort(t.cpuC.toDouble(), unit))
             }.joinToString("  ·  ")
-        } ?: "Starting…"
+        } ?: "جارٍ البدء…"
         val text = if (apps != null) "$battery\n$apps" else battery
         val builder = NotificationCompat.Builder(ctx, Notifier.CH_LOGGING)
             .setSmallIcon(R.drawable.ic_stat_battery)
@@ -58,7 +58,7 @@ object ServiceNotification {
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
         if (bs.active) {
             builder.addAction(
-                0, "Stop logging",
+                0, "إيقاف التسجيل",
                 PendingIntent.getService(
                     ctx, 0, Intent(ctx, BatteryLogService::class.java).setAction(BatteryLogService.ACTION_STOP),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
@@ -67,7 +67,7 @@ object ServiceNotification {
         }
         if (appsOn) {
             builder.addAction(
-                0, "Stop apps",
+                0, "إيقاف التطبيقات",
                 PendingIntent.getService(
                     ctx, 1, Intent(ctx, AppMonitorService::class.java).setAction(AppMonitorService.ACTION_STOP),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,

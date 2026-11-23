@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">BatteryLog</string>
-    <string name="tile_label">BatteryLog</string>
+    <string name="app_name">سجل البطارية</string>
+    <string name="tile_label">سجل البطارية</string>
 </resources>

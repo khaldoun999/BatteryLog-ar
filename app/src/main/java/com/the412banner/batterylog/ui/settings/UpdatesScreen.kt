@@ -80,8 +80,8 @@ fun UpdatesScreen(back: () -> Unit) {
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Updates") },
-                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") } },
+                title = { Text("التحديثات") },
+                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "رجوع") } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
@@ -130,13 +130,13 @@ fun UpdatesBody(
     samsung: Boolean = false,
 ) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SectionCard("This version", Icons.Rounded.SystemUpdate) {
-            InfoRow("Installed", BuildConfig.VERSION_NAME)
-            InfoRow("Build", BuildConfig.GIT_SHA)
-            InfoRow("Last check", if (settings.lastUpdateCheck > 0) Fmt.dateTime(settings.lastUpdateCheck) else "Never")
-            InfoRow("Channel", if (settings.includePrereleases) "Releases and test builds" else "Releases only")
+        SectionCard("هذا الإصدار", Icons.Rounded.SystemUpdate) {
+            InfoRow("المثبت", BuildConfig.VERSION_NAME)
+            InfoRow("البناء", BuildConfig.GIT_SHA)
+            InfoRow("آخر تحقق", if (settings.lastUpdateCheck > 0) Fmt.dateTime(settings.lastUpdateCheck) else "أبداً")
+            InfoRow("القناة", if (settings.includePrereleases) "الإصدارات والنسخ التجريبية" else "الإصدارات فقط")
             TextButton(onClick = { onPrereleases(!settings.includePrereleases) }) {
-                Text(if (settings.includePrereleases) "Only offer full releases" else "Also offer test builds")
+                Text(if (settings.includePrereleases) "عرض الإصدارات الكاملة فقط" else "عرض النسخ التجريبية أيضاً")
             }
         }
         val release = when (state) {
@@ -151,25 +151,25 @@ fun UpdatesBody(
         when (state) {
             UpdateState.Idle, UpdateState.Checking -> Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
                 CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                Text("  Checking GitHub for updates…")
+                Text("  جارٍ التحقق من التحديثات في GitHub…")
             }
-            is UpdateState.UpToDate -> SectionCard("You're up to date", Icons.Rounded.CheckCircle) {
+            is UpdateState.UpToDate -> SectionCard("أنت على أحدث إصدار", Icons.Rounded.CheckCircle) {
                 Text(
-                    state.latest?.let { "Newest ${if (it.prerelease) "test build" else "release"}: ${it.tag}" } ?: "No releases found.",
+                    state.latest?.let { "الأحدث ${if (it.prerelease) "نسخة تجريبية" else "إصدار"}: ${it.tag}" } ?: "لم يُعثر على إصدارات.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                TextButton(onClick = onCheck) { Text("Check again") }
+                TextButton(onClick = onCheck) { Text("التحقق مجدداً") }
             }
-            is UpdateState.Failed -> SectionCard("Update problem", Icons.Rounded.ErrorOutline, tint = MaterialTheme.colorScheme.error) {
+            is UpdateState.Failed -> SectionCard("مشكلة في التحديث", Icons.Rounded.ErrorOutline, tint = MaterialTheme.colorScheme.error) {
                 Text(state.message, color = MaterialTheme.colorScheme.error)
                 if (samsung && state.atInstall) AutoBlockerTip()
-                TextButton(onClick = onCheck) { Text("Try again") }
+                TextButton(onClick = onCheck) { Text("حاول مجدداً") }
             }
             else -> {}
         }
         if (release != null) {
-            SectionCard(release.title, Icons.Rounded.NewReleases, trailing = { if (release.prerelease) Pill("Test build") }) {
+            SectionCard(release.title, Icons.Rounded.NewReleases, trailing = { if (release.prerelease) Pill("نسخة تجريبية") }) {
                 Text(
                     listOfNotNull(
                         release.tag,
@@ -185,24 +185,24 @@ fun UpdatesBody(
                 when (state) {
                     is UpdateState.Downloading -> {
                         LinearProgressIndicator(progress = { state.progress }, modifier = Modifier.fillMaxWidth())
-                        Text("Downloading ${(state.progress * 100).toInt()} %", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+                        Text("جارٍ التنزيل ${(state.progress * 100).toInt()} %", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
                     }
-                    is UpdateState.Verifying -> Text("Checking the download…", style = MaterialTheme.typography.bodySmall)
-                    is UpdateState.Installing -> Text("Waiting for Android's installer…", style = MaterialTheme.typography.bodySmall)
+                    is UpdateState.Verifying -> Text("جارٍ التحقق من التنزيل…", style = MaterialTheme.typography.bodySmall)
+                    is UpdateState.Installing -> Text("بانتظار مثبت أندرويد…", style = MaterialTheme.typography.bodySmall)
                     is UpdateState.ReadyToInstall -> {
                         if (!canInstall) {
-                            Text("Allow BatteryLog to install updates first.", style = MaterialTheme.typography.bodyMedium)
-                            TextButton(onClick = onAllowInstall) { Text("Allow") }
+                            Text("اسمح أولاً لسجل البطارية بتثبيت التحديثات.", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(onClick = onAllowInstall) { Text("سماح") }
                             if (samsung) AutoBlockerTip()
                         }
-                        Button(onClick = { onInstall(state.release, state.file) }, enabled = canInstall, modifier = Modifier.fillMaxWidth()) { Text("Install") }
+                        Button(onClick = { onInstall(state.release, state.file) }, enabled = canInstall, modifier = Modifier.fillMaxWidth()) { Text("تثبيت") }
                     }
                     else -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = { onDownload(release) }) { Text("Download & install") }
-                        OutlinedButton(onClick = { onSkip(release) }) { Text("Skip") }
+                        Button(onClick = { onDownload(release) }) { Text("تنزيل وتثبيت") }
+                        OutlinedButton(onClick = { onSkip(release) }) { Text("تخطي") }
                     }
                 }
-                release.pageUrl?.let { url -> TextButton(onClick = { onOpenPage(url) }) { Text("View on GitHub") } }
+                release.pageUrl?.let { url -> TextButton(onClick = { onOpenPage(url) }) { Text("العرض في GitHub") } }
             }
         }
     }
@@ -212,7 +212,7 @@ fun UpdatesBody(
 @Composable
 private fun AutoBlockerTip() {
     Text(
-        "Samsung: if Android blocks the install, turn off Auto Blocker in Settings → Security and privacy → Auto Blocker.",
+        "أجهزة Samsung: إذا منع أندرويد التثبيت، أوقف الحظر التلقائي من الإعدادات ← الأمان والخصوصية ← الحظر التلقائي.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(vertical = 4.dp),

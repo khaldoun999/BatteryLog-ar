@@ -20,8 +20,8 @@ class Alerts(private val context: Context) {
                 chargeFired = true
                 Notifier.show(
                     context, Notifier.ID_CHARGE, Notifier.CH_ALERTS,
-                    "Charged to $pct %",
-                    "Your charge alarm is set to ${s.chargeAlarmPct} %. You can unplug now.",
+                    "تم الشحن إلى $pct %",
+                    "منبه الشحن مضبوط على ${s.chargeAlarmPct} %. يمكنك فصل الشاحن الآن.",
                 )
             }
             if (!b.onCharger || pct < s.chargeAlarmPct - 2) chargeFired = false
@@ -30,7 +30,7 @@ class Alerts(private val context: Context) {
         if (s.lowAlert) {
             if (!b.onCharger && pct <= s.lowAlertPct && !lowFired) {
                 lowFired = true
-                Notifier.show(context, Notifier.ID_LOW, Notifier.CH_ALERTS, "Battery at $pct %", "Plug in soon.")
+                Notifier.show(context, Notifier.ID_LOW, Notifier.CH_ALERTS, "البطارية عند $pct %", "وصّل الشاحن قريباً.")
             }
             if (b.onCharger || pct > s.lowAlertPct + 2) lowFired = false
         }
@@ -41,8 +41,8 @@ class Alerts(private val context: Context) {
                 tempFiredAt = now
                 Notifier.show(
                     context, Notifier.ID_TEMP, Notifier.CH_ALERTS,
-                    "Battery is hot: ${Fmt.temp(b.tempC, s.tempUnit)}",
-                    "It went over your ${Fmt.temp(s.tempAlertC.toDouble(), s.tempUnit)} alert.",
+                    "البطارية ساخنة: ${Fmt.temp(b.tempC, s.tempUnit)}",
+                    "تجاوزت حد التنبيه الذي ضبطته: ${Fmt.temp(s.tempAlertC.toDouble(), s.tempUnit)}.",
                 )
             }
             if (b.tempC < s.tempAlertC - 2) tempFiredAt = 0L

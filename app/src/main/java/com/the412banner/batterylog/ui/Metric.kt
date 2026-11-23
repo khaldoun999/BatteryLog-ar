@@ -16,11 +16,11 @@ import kotlin.math.abs
 
 /** What a chart shows. Power and current are signed: above zero = charging, below = drawing from the battery. */
 enum class Metric(val label: String) {
-    Level("Battery"),
-    Power("Power"),
-    Current("Current"),
-    Voltage("Voltage"),
-    Temp("Temperature");
+    Level("البطارية"),
+    Power("الطاقة"),
+    Current("التيار"),
+    Voltage("الجهد"),
+    Temp("الحرارة");
 
     val icon: ImageVector
         get() = when (this) {

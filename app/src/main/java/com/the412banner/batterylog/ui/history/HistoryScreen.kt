@@ -75,11 +75,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 enum class Range(val label: String, val ms: Long) {
-    H6("6 h", 6 * 3_600_000L),
-    H24("24 h", 24 * 3_600_000L),
-    D7("7 d", 7 * 86_400_000L),
-    D30("30 d", 30 * 86_400_000L),
-    D90("90 d", 90 * 86_400_000L),
+    H6("6 س", 6 * 3_600_000L),
+    H24("24 س", 24 * 3_600_000L),
+    D7("7 أيام", 7 * 86_400_000L),
+    D30("30 يوماً", 30 * 86_400_000L),
+    D90("90 يوماً", 90 * 86_400_000L),
 }
 
 data class WindowStats(
@@ -199,7 +199,7 @@ fun HistoryContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text("History", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
+            Text("السجل", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 12.dp))
         }
         item {
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
@@ -247,27 +247,27 @@ fun HistoryContent(
                     fixedMax = ui.metric.fixedMax,
                     minRange = ui.metric.minRange,
                     animateKey = Triple(ui.metric, ui.range, ui.set.size > 0),
-                    emptyText = if (ui.loading) "Loading…" else "Nothing logged in this range",
+                    emptyText = if (ui.loading) "جارٍ التحميل…" else "لم يُسجل شيء في هذا النطاق",
                     modifier = Modifier.fillMaxWidth().height(260.dp),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "Drag to read · pinch to zoom · double-tap to reset",
+                        "اسحب للقراءة · قرّب للتكبير · انقر مرتين لإعادة الضبط",
                         style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
                     )
                     AnimatedVisibility(chart.zoomed) {
-                        TextButton(onClick = { chart.reset() }) { Text("Reset") }
+                        TextButton(onClick = { chart.reset() }) { Text("إعادة") }
                     }
                 }
             }
         }
         item { StatsGrid(ui) }
-        item { SectionLabel("Recorded logs") }
+        item { SectionLabel("السجلات المسجلة") }
         if (ui.runs.isEmpty() && !ui.loading) {
             item {
                 AppCard {
-                    Text("No logs yet. Turn on Auto mode or tap Record now on the Now tab.", style = MaterialTheme.typography.bodyMedium)
+                    Text("لا سجلات بعد. فعّل الوضع التلقائي أو انقر «سجل الآن» في تبويب «الآن».", style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
@@ -282,25 +282,25 @@ private fun StatsGrid(ui: HistoryUi) {
     AnimatedContent(targetState = s, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "stats") { st ->
         AppCard {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                MiniStat("On battery", Fmt.duration(st.batteryMs), Modifier.weight(1f))
-                MiniStat("Used", batteriesValue(st.drained), Modifier.weight(1f), color = c.drain, sub = batteriesSub(st.drained))
-                MiniStat("Charged", batteriesValue(st.charged), Modifier.weight(1f), color = c.charging, sub = batteriesSub(st.charged))
+                MiniStat("على البطارية", Fmt.duration(st.batteryMs), Modifier.weight(1f))
+                MiniStat("استُخدم", batteriesValue(st.drained), Modifier.weight(1f), color = c.drain, sub = batteriesSub(st.drained))
+                MiniStat("شُحن", batteriesValue(st.charged), Modifier.weight(1f), color = c.charging, sub = batteriesSub(st.charged))
             }
             Spacer(Modifier.height(14.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                MiniStat("Drain", st.drainPctPerH?.let { "%.1f %%/h".format(it) } ?: "—", Modifier.weight(1f))
-                MiniStat("Avg power", st.drainWatts?.let { Fmt.watts(it) } ?: "—", Modifier.weight(1f))
-                MiniStat("Charging", Fmt.duration(st.chargeMs), Modifier.weight(1f))
+                MiniStat("التفريغ", st.drainPctPerH?.let { "%.1f %%/س".format(it) } ?: "—", Modifier.weight(1f))
+                MiniStat("متوسط الطاقة", st.drainWatts?.let { Fmt.watts(it) } ?: "—", Modifier.weight(1f))
+                MiniStat("الشحن", Fmt.duration(st.chargeMs), Modifier.weight(1f))
             }
             Spacer(Modifier.height(14.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                MiniStat("Lowest V", if (st.minMv > 0) "${Fmt.voltsShort(st.minMv)} @ ${st.minMvAtCap}%" else "—", Modifier.weight(1f))
+                MiniStat("أدنى جهد", if (st.minMv > 0) "${Fmt.voltsShort(st.minMv)} عند ${st.minMvAtCap}%" else "—", Modifier.weight(1f))
                 MiniStat(
-                    "Temperature",
+                    "الحرارة",
                     if (st.tMin != null && st.tMax != null) "${Fmt.tempShort(st.tMin.toDouble(), ui.tempUnit)}–${Fmt.tempShort(st.tMax.toDouble(), ui.tempUnit)}" else "—",
                     Modifier.weight(1f),
                 )
-                MiniStat("Sessions", "${st.sessions}", Modifier.weight(1f))
+                MiniStat("الجلسات", "${st.sessions}", Modifier.weight(1f))
             }
         }
     }
@@ -334,16 +334,16 @@ private fun RunRow(run: LogInfo, active: Boolean, onClick: () -> Unit) {
                     )
                     if (active) {
                         Spacer(Modifier.width(8.dp))
-                        com.the412banner.batterylog.ui.components.Pill("Live", c.bad)
+                        com.the412banner.batterylog.ui.components.Pill("مباشر", c.bad)
                     }
                 }
                 val kind = when (run.kind) {
-                    LogKind.Boot -> "Boot log"
-                    LogKind.App -> "App log"
-                    LogKind.Other -> "Log"
+                    LogKind.Boot -> "سجل إقلاع"
+                    LogKind.App -> "سجل التطبيق"
+                    LogKind.Other -> "سجل"
                 }
                 Text(
-                    "$kind · ${Fmt.duration(run.durationMs)} · ${run.count} samples",
+                    "$kind · ${Fmt.duration(run.durationMs)} · ${run.count} عينة",
                     style = MaterialTheme.typography.bodySmall.merge(NumberStyle), color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(8.dp))

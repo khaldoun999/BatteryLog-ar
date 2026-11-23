@@ -109,7 +109,7 @@ fun AppDetailScreen(pkg: String, back: () -> Unit) {
                         }
                     }
                 },
-                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Back") } },
+                navigationIcon = { IconButton(onClick = back) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "رجوع") } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
@@ -128,7 +128,7 @@ fun AppDetailScreen(pkg: String, back: () -> Unit) {
             val s = d.summary
             if (s == null) {
                 Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) {
-                    Text("Nothing recorded for this app in this period", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("لم يُسجل شيء لهذا التطبيق في هذه الفترة", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 return@Column
             }
@@ -146,34 +146,34 @@ private fun tempStr(st: Stat, unit: TempUnit): String =
 @Composable
 private fun Summary(s: AppSummary, unit: TempUnit) {
     val c = LocalChartColors.current
-    SectionCard("While in use", Icons.Rounded.Bolt, tint = c.power) {
+    SectionCard("أثناء الاستخدام", Icons.Rounded.Bolt, tint = c.power) {
         Grid(
             listOf(
-                "Screen time" to Fmt.duration(s.fgMs),
-                "Energy" to "%.2f Wh".format(s.energyWh),
-                "Power avg / peak" to if (s.drawW.n == 0) "—" else "%.2f / %.2f W".format(s.drawW.avg, s.drawW.max),
-                "GPU load avg / peak" to if (s.gpuPct.n == 0) "—" else "%.0f / %.0f %%".format(s.gpuPct.avg, s.gpuPct.max),
-                "App CPU avg / peak" to if (s.fgCpuPct.n == 0) "—" else "%.1f / %.1f %%".format(s.fgCpuPct.avg, s.fgCpuPct.max),
-                "CPU time (all)" to Fmt.duration(s.cpuMs),
+                "وقت الشاشة" to Fmt.duration(s.fgMs),
+                "الطاقة" to "%.2f Wh".format(s.energyWh),
+                "الطاقة المتوسط / الذروة" to if (s.drawW.n == 0) "—" else "%.2f / %.2f W".format(s.drawW.avg, s.drawW.max),
+                "حمل GPU المتوسط / الذروة" to if (s.gpuPct.n == 0) "—" else "%.0f / %.0f %%".format(s.gpuPct.avg, s.gpuPct.max),
+                "CPU التطبيق المتوسط / الذروة" to if (s.fgCpuPct.n == 0) "—" else "%.1f / %.1f %%".format(s.fgCpuPct.avg, s.fgCpuPct.max),
+                "وقت CPU (الكل)" to Fmt.duration(s.cpuMs),
             ),
         )
     }
-    SectionCard("Temperatures (avg / max)", Icons.Rounded.Thermostat, tint = c.temp) {
+    SectionCard("الحرارة (المتوسط / الأعلى)", Icons.Rounded.Thermostat, tint = c.temp) {
         Grid(
             listOf(
                 "CPU" to tempStr(s.cpuC, unit),
                 "GPU" to tempStr(s.gpuC, unit),
-                "Skin" to tempStr(s.skinC, unit),
-                "Battery" to tempStr(s.battC, unit),
+                "السطح" to tempStr(s.skinC, unit),
+                "البطارية" to tempStr(s.battC, unit),
             ),
         )
     }
-    SectionCard("Memory", Icons.Rounded.Memory, tint = c.level) {
+    SectionCard("الذاكرة", Icons.Rounded.Memory, tint = c.level) {
         Grid(
             listOf(
-                "RAM avg" to mb(s.rssAvgKb),
-                "RAM peak" to mb(s.rssMaxKb),
-                "GPU memory peak" to mb(s.gpuMaxKb),
+                "متوسط RAM" to mb(s.rssAvgKb),
+                "ذروة RAM" to mb(s.rssMaxKb),
+                "ذروة ذاكرة GPU" to mb(s.gpuMaxKb),
             ),
         )
     }
@@ -201,14 +201,14 @@ private fun minuteSeries(rows: List<MRow>, f: (MRow) -> Float): Series =
 
 /** Metrics the app chart can show (chips like the History screen). */
 private enum class AppMetric(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    Power("Power", Icons.Rounded.Bolt),
-    Cpu("App CPU", Icons.Rounded.Speed),
+    Power("الطاقة", Icons.Rounded.Bolt),
+    Cpu("CPU التطبيق", Icons.Rounded.Speed),
     Gpu("GPU", Icons.Rounded.Videocam),
-    CpuTemp("CPU temp", Icons.Rounded.Thermostat),
-    GpuTemp("GPU temp", Icons.Rounded.Thermostat),
+    CpuTemp("حرارة CPU", Icons.Rounded.Thermostat),
+    GpuTemp("حرارة GPU", Icons.Rounded.Thermostat),
     Ram("RAM", Icons.Rounded.Memory),
-    GpuMem("GPU memory", Icons.Rounded.Memory),
-    CpuAll("CPU (always)", Icons.Rounded.Speed),
+    GpuMem("ذاكرة GPU", Icons.Rounded.Memory),
+    CpuAll("CPU (دائماً)", Icons.Rounded.Speed),
 }
 
 /** Charging periods (shaded on the chart). */
@@ -289,17 +289,17 @@ private fun Charts(pkg: String, d: Detail, unit: TempUnit, period: Period) {
             minRange = minRange,
             gapMs = 90_000L,
             animateKey = Triple(metric, period, d.timeline.size > 0),
-            emptyText = if (metric == AppMetric.Ram || metric == AppMetric.CpuAll) "Nothing recorded in this range" else "Not on screen in this range",
+            emptyText = if (metric == AppMetric.Ram || metric == AppMetric.CpuAll) "لم يُسجل شيء في هذا النطاق" else "لم يكن على الشاشة في هذا النطاق",
             modifier = Modifier.fillMaxWidth().height(260.dp),
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Drag to read · pinch to zoom · double-tap to reset",
+                "اسحب للقراءة · قرّب للتكبير · انقر مرتين لإعادة الضبط",
                 style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
             androidx.compose.animation.AnimatedVisibility(chart.zoomed) {
-                TextButton(onClick = { chart.reset() }) { Text("Reset") }
+                TextButton(onClick = { chart.reset() }) { Text("إعادة") }
             }
         }
     }
@@ -312,29 +312,29 @@ private fun AllMetrics(pkg: String, d: Detail, unit: TempUnit) {
     val fg = d.timeline.filter { it.fg == pkg }
     fun tc(v: Float) = if (v.isNaN()) v else if (unit == TempUnit.F) v * 9f / 5f + 32f else v
     val metrics: List<Pair<String, Stat>> = listOf(
-        "Power draw (W)" to Stat.of(fg.asSequence().map { it.drawW.toFloat() }),
-        "Battery (%)" to Stat.of(fg.asSequence().map { it.level.toFloat().takeIf { v -> v >= 0 } ?: Float.NaN }),
-        "Device CPU (%)" to Stat.of(fg.asSequence().map { it.cpuPct }),
-        "App CPU (%)" to Stat.of(fg.asSequence().map { it.fgCpuPct }),
-        "GPU load (%)" to Stat.of(fg.asSequence().map { it.gpuPct }),
-        "GPU clock (MHz)" to Stat.of(fg.asSequence().map { it.gpuMhz }),
-        "CPU temp" to Stat.of(fg.asSequence().map { tc(it.cpuC) }),
-        "GPU temp" to Stat.of(fg.asSequence().map { tc(it.gpuC) }),
-        "Skin temp" to Stat.of(fg.asSequence().map { tc(it.skinC) }),
-        "Memory temp" to Stat.of(fg.asSequence().map { tc(it.ddrC) }),
-        "Battery temp" to Stat.of(fg.asSequence().map { tc(it.battC) }),
-        "App RAM (MB)" to Stat.of(fg.asSequence().map { it.fgRssKb / 1024f }),
-        "App GPU memory (MB)" to Stat.of(fg.asSequence().map { it.fgGpuKb / 1024f }),
-        "CPU ms per minute (all)" to Stat.of(d.minutes.asSequence().map { it.cpuMs.toFloat() }),
-        "RAM avg per minute (MB)" to Stat.of(d.minutes.asSequence().map { it.rssAvgKb / 1024f }),
-        "RAM peak per minute (MB)" to Stat.of(d.minutes.asSequence().map { it.rssMaxKb / 1024f }),
-        "GPU memory peak per minute (MB)" to Stat.of(d.minutes.asSequence().map { it.gpuMaxKb / 1024f }),
-        "Energy per minute (mWh)" to Stat.of(d.minutes.asSequence().map { (it.fgEnergyMj / 3600.0).toFloat() }),
+        "سحب الطاقة (W)" to Stat.of(fg.asSequence().map { it.drawW.toFloat() }),
+        "البطارية (%)" to Stat.of(fg.asSequence().map { it.level.toFloat().takeIf { v -> v >= 0 } ?: Float.NaN }),
+        "CPU الجهاز (%)" to Stat.of(fg.asSequence().map { it.cpuPct }),
+        "CPU التطبيق (%)" to Stat.of(fg.asSequence().map { it.fgCpuPct }),
+        "حمل GPU (%)" to Stat.of(fg.asSequence().map { it.gpuPct }),
+        "ساعة GPU (MHz)" to Stat.of(fg.asSequence().map { it.gpuMhz }),
+        "حرارة CPU" to Stat.of(fg.asSequence().map { tc(it.cpuC) }),
+        "حرارة GPU" to Stat.of(fg.asSequence().map { tc(it.gpuC) }),
+        "حرارة السطح" to Stat.of(fg.asSequence().map { tc(it.skinC) }),
+        "حرارة الذاكرة" to Stat.of(fg.asSequence().map { tc(it.ddrC) }),
+        "حرارة البطارية" to Stat.of(fg.asSequence().map { tc(it.battC) }),
+        "RAM التطبيق (MB)" to Stat.of(fg.asSequence().map { it.fgRssKb / 1024f }),
+        "ذاكرة GPU للتطبيق (MB)" to Stat.of(fg.asSequence().map { it.fgGpuKb / 1024f }),
+        "CPU مللي ثانية في الدقيقة (الكل)" to Stat.of(d.minutes.asSequence().map { it.cpuMs.toFloat() }),
+        "متوسط RAM في الدقيقة (MB)" to Stat.of(d.minutes.asSequence().map { it.rssAvgKb / 1024f }),
+        "ذروة RAM في الدقيقة (MB)" to Stat.of(d.minutes.asSequence().map { it.rssMaxKb / 1024f }),
+        "ذروة ذاكرة GPU في الدقيقة (MB)" to Stat.of(d.minutes.asSequence().map { it.gpuMaxKb / 1024f }),
+        "الطاقة في الدقيقة (mWh)" to Stat.of(d.minutes.asSequence().map { (it.fgEnergyMj / 3600.0).toFloat() }),
     )
-    SectionCard("All metrics", Icons.Rounded.TableChart, tint = c.current, subtitle = "${fg.size} samples while in use · ${d.minutes.size} minutes") {
+    SectionCard("كل المقاييس", Icons.Rounded.TableChart, tint = c.current, subtitle = "${fg.size} عينة أثناء الاستخدام · ${d.minutes.size} دقيقة") {
         Row(Modifier.fillMaxWidth()) {
-            Text("Metric", Modifier.weight(1.6f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            listOf("Min", "Avg", "Max").forEach {
+            Text("المقياس", Modifier.weight(1.6f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            listOf("الأدنى", "المتوسط", "الأعلى").forEach {
                 Text(it, Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -348,7 +348,7 @@ private fun AllMetrics(pkg: String, d: Detail, unit: TempUnit) {
             }
         }
     }
-    SectionCard("Samples", Icons.Rounded.Videocam, tint = c.voltage, subtitle = "Newest ${minOf(300, fg.size)} while in use") {
+    SectionCard("العينات", Icons.Rounded.Videocam, tint = c.voltage, subtitle = "الأحدث ${minOf(300, fg.size)} أثناء الاستخدام") {
         val header = "time      W     CPU%  app%  GPU%  MHz   CPU°  GPU°  skin° batt° RAM MB GPU MB"
         Column(Modifier.horizontalScroll(rememberScrollState())) {
             Text(header, fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -370,11 +370,11 @@ private fun HudCard(pkg: String) {
     val metrics = hud.apps[pkg]
     val on = metrics != null
     SectionCard(
-        "HUD", Icons.Rounded.Speed, tint = LocalChartColors.current.temp,
+        "العارض العلوي", Icons.Rounded.Speed, tint = LocalChartColors.current.temp,
         subtitle = when {
-            !hud.enabled -> "HUD overlay is off in Settings"
-            on -> "Shows over this app"
-            else -> "Off for this app"
+            !hud.enabled -> "العارض العلوي متوقف في الإعدادات"
+            on -> "يظهر فوق هذا التطبيق"
+            else -> "متوقف لهذا التطبيق"
         },
         trailing = {
             androidx.compose.material3.Switch(checked = on, onCheckedChange = { v ->

@@ -102,17 +102,17 @@ fun HudAppsSection() {
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Text(appLabel(ctx, pkg), style = MaterialTheme.typography.bodyLarge, maxLines = 1)
-                    Text("${hud.apps[pkg]?.size ?: 0} metrics", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${hud.apps[pkg]?.size ?: 0} مقياس", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Icon(if (open == pkg) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null)
-                IconButton(onClick = { removeHudApp(pkg); if (open == pkg) open = null }) { Icon(Icons.Rounded.Close, "Remove") }
+                IconButton(onClick = { removeHudApp(pkg); if (open == pkg) open = null }) { Icon(Icons.Rounded.Close, "إزالة") }
             }
             if (open == pkg) HudMetricChips(pkg)
         }
         FilledTonalButton(onClick = { picking = true }) {
             Icon(Icons.Rounded.Add, null)
             Spacer(Modifier.width(6.dp))
-            Text("Add a game")
+            Text("إضافة لعبة")
         }
     }
     if (picking) {
@@ -148,11 +148,11 @@ private fun AppPickerDialog(exclude: Set<String>, onPick: (String) -> Unit, onDi
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-        title = { Text("Add a game") },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("إلغاء") } },
+        title = { Text("إضافة لعبة") },
         text = {
             Column {
-                OutlinedTextField(query, { query = it }, singleLine = true, placeholder = { Text("Search") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(query, { query = it }, singleLine = true, placeholder = { Text("بحث") }, modifier = Modifier.fillMaxWidth())
                 val list = apps
                 if (list == null) {
                     CircularProgressIndicator(Modifier.padding(24.dp))
@@ -171,7 +171,7 @@ private fun AppPickerDialog(exclude: Set<String>, onPick: (String) -> Unit, onDi
                                     Text(a.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
                                     Text(a.pkg, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                                 }
-                                if (a.game) Pill("Game")
+                                if (a.game) Pill("لعبة")
                             }
                         }
                     }

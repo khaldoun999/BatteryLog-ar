@@ -207,8 +207,8 @@ fun MiniStat(
 /** "205 %" over a period reads oddly; from one full battery up it is shown as batteries (2.1 batteries). */
 fun batteriesValue(pct: Int): String = when {
     pct < 100 -> "$pct %"
-    pct < 105 -> "1 battery"
-    else -> "%.1f batteries".format(pct / 100.0)
+    pct < 105 -> "بطارية واحدة"
+    else -> "%.1f بطارية".format(pct / 100.0)
 }
 
 fun batteriesSub(pct: Int): String? = if (pct >= 100) "$pct %" else null

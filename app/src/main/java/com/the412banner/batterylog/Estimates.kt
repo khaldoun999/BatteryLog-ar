@@ -75,6 +75,6 @@ object Estimates {
         if (min == null || min <= 0) return "—"
         val h = min / 60
         val m = min % 60
-        return if (h > 0) "${h}h %02dm".format(m) else "${m}m"
+        return if (h > 0) "${h} س %02d د".format(m) else "${m} د"
     }
 }

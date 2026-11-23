@@ -103,7 +103,7 @@ class UpdateRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            _state.value = UpdateState.Failed("Couldn't check for updates: ${e.message ?: e.javaClass.simpleName}")
+            _state.value = UpdateState.Failed("تعذر التحقق من التحديثات: ${e.message ?: e.javaClass.simpleName}")
             null
         }
     }
@@ -119,7 +119,7 @@ class UpdateRepository(
 
     private suspend fun fetchReleases(): List<GhRelease> {
         val (code, body) = getText("https://api.github.com/repos/$repo/releases?per_page=20")
-        if (code !in 200..299) throw IllegalStateException("GitHub answered HTTP $code")
+        if (code !in 200..299) throw IllegalStateException("رد GitHub بالرمز HTTP $code")
         return json.decodeFromString(ListSerializer(GhRelease.serializer()), body)
     }
 
@@ -133,8 +133,8 @@ class UpdateRepository(
                 val request = Request.Builder().url(release.apk.url).header("User-Agent", "BatteryLog/$installed").build()
                 http.newBuilder().readTimeout(60, TimeUnit.SECONDS).callTimeout(0, TimeUnit.SECONDS).build()
                     .newCall(request).execute().use { response ->
-                        if (!response.isSuccessful) throw IllegalStateException("Download failed (HTTP ${response.code})")
-                        val body = response.body ?: throw IllegalStateException("Empty download")
+                        if (!response.isSuccessful) throw IllegalStateException("فشل التنزيل (HTTP ${response.code})")
+                        val body = response.body ?: throw IllegalStateException("تنزيل فارغ")
                         val total = body.contentLength().takeIf { it > 0 } ?: release.apk.size
                         body.byteStream().use { input ->
                             file.outputStream().use { out ->
@@ -161,19 +161,19 @@ class UpdateRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            _state.value = UpdateState.Failed(e.message ?: "Download failed", release)
+            _state.value = UpdateState.Failed(e.message ?: "فشل التنزيل", release)
         }
     }
 
     private suspend fun verify(release: AppRelease, file: File) {
         release.checksum?.let { asset ->
             val (code, body) = getText(asset.url)
-            if (code !in 200..299) throw IllegalStateException("Couldn't read the checksum file (HTTP $code)")
+            if (code !in 200..299) throw IllegalStateException("تعذرت قراءة ملف بصمة التحقق (HTTP $code)")
             val expected = body.trim().split(Regex("\\s+")).firstOrNull()?.lowercase()
             val actual = withContext(Dispatchers.IO) { sha256(file) }
             if (expected == null || expected != actual) {
                 file.delete()
-                throw IllegalStateException("Checksum mismatch — the download was not installed.")
+                throw IllegalStateException("بصمة التحقق غير مطابقة — لم يُثبت التنزيل.")
             }
         }
         val info = withContext(Dispatchers.IO) {
@@ -186,7 +186,7 @@ class UpdateRepository(
         }
         if (info == null || info.packageName != context.packageName) {
             file.delete()
-            throw IllegalStateException("The downloaded file is not an update for this app.")
+            throw IllegalStateException("الملف المنزّل ليس تحديثاً لهذا التطبيق.")
         }
     }
 
@@ -197,7 +197,7 @@ class UpdateRepository(
     fun installFinished(success: Boolean, message: String?) {
         val s = _state.value
         val release = (s as? UpdateState.Installing)?.release
-        _state.value = if (success) UpdateState.Idle else UpdateState.Failed(message ?: "Install cancelled", release, atInstall = true)
+        _state.value = if (success) UpdateState.Idle else UpdateState.Failed(message ?: "أُلغي التثبيت", release, atInstall = true)
     }
 
     fun reset() {
