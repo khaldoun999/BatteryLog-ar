@@ -37,7 +37,7 @@ object ReportText {
         row("  متوسط السحب", r.avgDrainW?.let { Fmt.watts(it) } ?: "-")
         row("  ذروة السحب", r.peakDrainW?.let { Fmt.watts(it) } ?: "-")
         row("  متوسط التيار", r.avgDrainMa?.let { Fmt.ma(it) } ?: "-")
-        row("  ذروة التيار", r.peakDrainMa?.let { "${Fmt.ma(it)} عند ${r.peakDrainAtCap} %"" } ?: "-")
+        row("  ذروة التيار", r.peakDrainMa?.let { "${Fmt.ma(it)} عند ${r.peakDrainAtCap} %" } ?: "-")
         r.avgChargeW?.let { row("  متوسط الشحن", Fmt.watts(it)) }
         r.peakChargeW?.let { row("  ذروة الشحن", Fmt.watts(it)) }
         line()
